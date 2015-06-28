@@ -154,7 +154,6 @@ $("#wwwc").click(function() {
     cornerstoneTools.wwwc.activate(element, 1);
 });
 
-
-
-
-
+$(function(){
+    $("[data-toggle='tooltip']").tooltip();
+});

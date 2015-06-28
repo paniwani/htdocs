@@ -35,6 +35,7 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 <body>
 
 <div class="container">
+    
     <div class="row">
         <div class="col-md-8">
             <div id="dicomImageWrapper" style="width:700px;height:700px;position:relative;color: white;"
@@ -59,9 +60,11 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <ul class="nav nav-pills">
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="wwwc"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="bottom" title="Pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="bottom" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
             </ul>
+
+
         </div>
 
         <div id="legend">
@@ -97,6 +100,7 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </body>
 
 <script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
 <script src="js/cornerstone.min.js"></script>
 <script src="js/cornerstoneMath.min.js"></script>
 <script src="js/cornerstoneTools.min.js"></script>

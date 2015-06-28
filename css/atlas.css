@@ -15,3 +15,7 @@ body {
   -moz-overflow: hidden;
   margin-top:20px;
 }
+
+button {
+  display:inline-block;
+}
