@@ -46,13 +46,12 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 
                 <div id="dicomImage" oncontextmenu="return false"
                      style="width:700px;height:700px;top:0px;left:0px; position:absolute">
-                    <div id="mrbottomright" style="position: absolute;bottom:6px; right:3px">
-                        <div id="frameRate"></div>
+                    <div id="imgtopright" style="position: absolute;top:6px; right:3px">
                         <div id="zoomText">Zoom: </div>
                         <div id="sliceText">Image: </div>
                     </div>
-                    <div id="mrbottomleft" style="position: absolute;bottom:3px; left:3px">
-                        WW/WC:
+                    <div id="imgbottomleft" style="position: absolute;bottom:3px; left:3px">
+                        <div id="wwwcText">WW/WC: </div>
                     </div>
                 </div>
             </div>
@@ -68,7 +67,7 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <div id="legend">
             <div class="col-md-2">
                 <?php
-                    foreach(array_slice($regions,0,21) as $region) {
+                    foreach(array_slice($regions,0,30) as $region) {
                         echo "<div>";
                         echo "<div class='color-swatch' style='background-color: rgb(".$region["color"].");')></div>";
                         echo "<p>".$region["name"]."</p>";

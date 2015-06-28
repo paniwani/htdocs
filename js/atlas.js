@@ -19,41 +19,67 @@ var stack = {
 };
 
 var stackContours = new Array(numSlices);
+for (var i=0; i<numSlices; i++) {
+    stackContours[i] = new Array;
+}
+
+// Grab the stack of contours upfront and sort them by z
+$.get("contours.php", {imageID: imageID}).done(function(data) {
+    var contours = $.parseJSON(data);
+        
+    for (var i=0; i<contours.length; i++) {
+        c = contours[i];
+
+        // Clean up the JSON
+        c.points = c.points.split(",").map(Number);
+        c.color = c.color.split(",").map(Number);
+        c.sliceIndex = parseInt(c.sliceIndex);
+
+        // Store it in the stack sorted by z index
+        stackContours[c.sliceIndex-1].push(c);
+    }
+
+    // Now that we have the whole stack
+    // Setup the image
+    setupImage();
+});
 
 // Enable the dicomImage element
 cornerstone.enable(element);
 
-cornerstone.loadAndCacheImage(imageIds[stack.currentImageIdIndex]).then(function(image) {
-    // Display the image
-    cornerstone.displayImage(element, image);
+function setupImage() {
+    cornerstone.loadAndCacheImage(imageIds[stack.currentImageIdIndex]).then(function(image) {
+        // Display the image
+        cornerstone.displayImage(element, image);
 
-    // Enable mouse and keyboard inputs
-    cornerstoneTools.keyboardInput.enable(element);
-    cornerstoneTools.mouseInput.enable(element);
-    cornerstoneTools.mouseWheelInput.enable(element);
+        // Enable mouse and keyboard inputs
+        cornerstoneTools.keyboardInput.enable(element);
+        cornerstoneTools.mouseInput.enable(element);
+        cornerstoneTools.mouseWheelInput.enable(element);
 
-    // Set the stack as tool state
-    cornerstoneTools.addStackStateManager(element, ['stack']);
-    cornerstoneTools.addToolState(element, 'stack', stack);
+        // Set the stack as tool state
+        cornerstoneTools.addStackStateManager(element, ['stack']);
+        cornerstoneTools.addToolState(element, 'stack', stack);
 
-    // Set the div to focused, so keypress events are handled
-    $(element).attr("tabindex", 0).focus();
+        // Set the div to focused, so keypress events are handled
+        $(element).attr("tabindex", 0).focus();
 
-    // Enable all tools we want to use with this element
-    cornerstoneTools.stackScrollKeyboard.activate(element);
-    // cornerstoneTools.stackScroll.activate(element, 1);
-    cornerstoneTools.stackScrollWheel.activate(element);
+        // Enable all tools we want to use with this element
+        cornerstoneTools.stackScrollKeyboard.activate(element);
+        // cornerstoneTools.stackScroll.activate(element, 1);
+        cornerstoneTools.stackScrollWheel.activate(element);
 
-    cornerstoneTools.pan.activate(element, 1);
-    // cornerstoneTools.wwwc.activate(element, 1);
-    // cornerstoneTools.zoomWheel.activate(element);
-    // cornerstoneTools.zoom.activate(element, 2);
+        cornerstoneTools.pan.activate(element, 1);
+        // cornerstoneTools.wwwc.activate(element, 1);
+        // cornerstoneTools.zoomWheel.activate(element);
+        // cornerstoneTools.zoom.activate(element, 2);
 
-    // Set default zoom scale
-    viewport = cornerstone.getViewport(element);
-    viewport.scale = 2.5;
-    cornerstone.setViewport(element, viewport);
-});
+        // Set default zoom scale
+        viewport = cornerstone.getViewport(element);
+        viewport.scale = 2.5;
+        cornerstone.setViewport(element, viewport);
+    });
+}
 
 function drawContour(points, color, ctx) {
     // console.log('Drawing contour.');
@@ -72,7 +98,7 @@ function drawContour(points, color, ctx) {
     };
 
     // Close the contour
-    ctx.lineTo(points[0], points[1]);
+    ctx.closePath();
     ctx.stroke();
 };
 
@@ -91,31 +117,15 @@ $(element).on("CornerstoneImageRendered", function(event, detail) {
     var ctx = detail.canvasContext;
     ctx.lineWidth = 1;
 
-    // Get the contour for this slice from the server and draw it
-    if (! stackContours[stack.currentImageIdIndex] ) {
-        $.get("contours.php", {imageID: imageID, sliceIndex: stack.currentImageIdIndex+1}).done(function(data) {
-            var contours = $.parseJSON(data);
-                
-            // Map json back to arrays
-            for (var i=0; i<contours.length; i++) {
-                contours[i].points = contours[i].points.split(",").map(Number);
-                contours[i].color = contours[i].color.split(",").map(Number);
-            }
-
-            stackContours[stack.currentImageIdIndex] = contours;
-            drawContours(contours, ctx);
-        });
-    } else {
-        // Get existing contour and draw it
-        contours = stackContours[stack.currentImageIdIndex];
-        drawContours(contours, ctx);
-    }
+    // Get existing contour and draw it
+    contours = stackContours[stack.currentImageIdIndex];
+    drawContours(contours, ctx);
 });
 
 // Image text
 function onViewportUpdated(e, data) {
     var viewport = data.viewport;
-    $('#mrbottomleft').text("WW/WC: " + Math.round(viewport.voi.windowWidth) + "/" + Math.round(viewport.voi.windowCenter));
+    $('#wwwcText').text("WW/WC: " + Math.round(viewport.voi.windowWidth) + "/" + Math.round(viewport.voi.windowCenter));
     $('#zoomText').text("Zoom: " + viewport.scale.toFixed(2));
     $("#sliceText").text("Image: " + (stack.currentImageIdIndex + 1) + "/" + numSlices);
 };
