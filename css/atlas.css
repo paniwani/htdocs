@@ -1,0 +1,15 @@
+.color-swatch {
+  width:10px;
+  height:10px;
+  float:left;
+  margin:4px 4px 0 0;
+}
+
+#legend {
+  font-size:10px;
+}
+
+body {
+  overflow:hidden;
+  margin-top:16px;
+}
