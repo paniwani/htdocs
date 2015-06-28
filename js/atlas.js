@@ -42,12 +42,12 @@ cornerstone.loadAndCacheImage(imageIds[stack.currentImageIdIndex]).then(function
     // Enable all tools we want to use with this element
     cornerstoneTools.stackScrollKeyboard.activate(element);
     // cornerstoneTools.stackScroll.activate(element, 1);
-    // cornerstoneTools.stackScrollWheel.activate(element);
+    cornerstoneTools.stackScrollWheel.activate(element);
 
-    // cornerstoneTools.pan.activate(element, 1);
-    cornerstoneTools.wwwc.activate(element, 1);
-    cornerstoneTools.zoomWheel.activate(element);
-    cornerstoneTools.zoom.activate(element, 2);
+    cornerstoneTools.pan.activate(element, 1);
+    // cornerstoneTools.wwwc.activate(element, 1);
+    // cornerstoneTools.zoomWheel.activate(element);
+    // cornerstoneTools.zoom.activate(element, 2);
 
     // Set default zoom scale
     viewport = cornerstone.getViewport(element);
@@ -112,14 +112,38 @@ $(element).on("CornerstoneImageRendered", function(event, detail) {
     }
 });
 
+// Image text
 function onViewportUpdated(e, data) {
     var viewport = data.viewport;
     $('#mrbottomleft').text("WW/WC: " + Math.round(viewport.voi.windowWidth) + "/" + Math.round(viewport.voi.windowCenter));
     $('#zoomText').text("Zoom: " + viewport.scale.toFixed(2));
     $("#sliceText").text("Image: " + (stack.currentImageIdIndex + 1) + "/" + numSlices);
 };
-
 $(element).on("CornerstoneImageRendered", onViewportUpdated);
+
+// Toolbar
+$("#zoom-in").click(function() {
+    viewport = cornerstone.getViewport(element);
+    viewport.scale += 0.5;
+    cornerstone.setViewport(element, viewport);
+});
+
+$("#zoom-out").click(function() {
+    viewport = cornerstone.getViewport(element);
+    viewport.scale -= 0.5;
+    cornerstone.setViewport(element, viewport);
+});  
+
+$("#pan").click(function() {
+    cornerstoneTools.pan.activate(element, 1);
+    cornerstoneTools.wwwc.deactivate(element, 1);
+});
+
+$("#wwwc").click(function() {
+    cornerstoneTools.pan.deactivate(element, 1);
+    cornerstoneTools.wwwc.activate(element, 1);
+});
+
 
 
 

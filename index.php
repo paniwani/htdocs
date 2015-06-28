@@ -10,7 +10,7 @@ if ($conn->connect_error) {
 }
 
 // Set image
-$imageID = 3;
+$imageID = isset($_GET['id']) ? $_GET['id'] : 1;
 
 // Get image information
 $sql = "select * from images where id=$imageID";
@@ -34,15 +34,10 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 <body>
 
-<?php
-    // Store image data in DOM for JS
-    echo "<div id='image-data' data-id='".$imageID."' data-name='".$img['name']."' data-baseName='".$img['basename']."' data-numSlices=".$img['numSlices']."></div>";
-?>
-
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
-            <div id="dicomImageWrapper" style="width:512px;height:512px;position:relative;color: white;"
+        <div class="col-md-8">
+            <div id="dicomImageWrapper" style="width:700px;height:700px;position:relative;color: white;"
                  class="cornerstone-enabled-image"
                  oncontextmenu="return false"
                  unselectable='on'
@@ -50,7 +45,7 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                  onmousedown='return false;'>
                 
                 <div id="dicomImage" oncontextmenu="return false"
-                     style="width:512px;height:512px;top:0px;left:0px; position:absolute">
+                     style="width:700px;height:700px;top:0px;left:0px; position:absolute">
                     <div id="mrbottomright" style="position: absolute;bottom:6px; right:3px">
                         <div id="frameRate"></div>
                         <div id="zoomText">Zoom: </div>
@@ -61,10 +56,17 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     </div>
                 </div>
             </div>
+
+            <ul class="nav nav-pills">
+              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="wwwc"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
+            </ul>
         </div>
 
-        <div id="legend" class="col-md-6">
-            <div class="col-md-3">
+        <div id="legend">
+            <div class="col-md-2">
                 <?php
                     foreach(array_slice($regions,0,21) as $region) {
                         echo "<div>";
@@ -75,7 +77,7 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 ?>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <?php
                     foreach(array_slice($regions,22,-1) as $region) {
                         echo "<div>";
@@ -88,6 +90,11 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
         </div>
     </div>
 </div>
+
+<?php
+    // Store image data in DOM for JS
+    echo "<div id='image-data' data-id='".$imageID."' data-name='".$img['name']."' data-baseName='".$img['basename']."' data-numSlices=".$img['numSlices']."></div>";
+?>
 </body>
 
 <script src="js/jquery.min.js"></script>
