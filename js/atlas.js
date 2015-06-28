@@ -1,10 +1,16 @@
 var element = $('#dicomImage').get(0);
 
-var imageIds = [];
-var NUM_SLICES = 206;
+// Get image information from DOM
+var imgdata = $('#image-data').get(0).dataset;
+var imageID = imgdata.id;
+var numSlices = parseInt(imgdata.numslices);
+var imageName = imgdata.name;
+var baseName = imgdata.basename;
 
-for (var i=1; i < NUM_SLICES+1; i++) {
-    imageIds.push("dicomweb:img/BP_30056267/CT/CT.1.2.840.113619.2.55.3.346865037.294.1409320864.82." + i + ".dcm");
+// Set up stack
+var imageIds = [];
+for (var i=1; i < numSlices+1; i++) {
+    imageIds.push("dicomweb:img/" + imageName + "/CT/" + baseName + "." + i + ".dcm");
 };
 
 var stack = {
@@ -12,7 +18,7 @@ var stack = {
     imageIds: imageIds
 };
 
-var stackContours = new Array(NUM_SLICES);
+var stackContours = new Array(numSlices);
 
 // Enable the dicomImage element
 cornerstone.enable(element);
@@ -87,7 +93,7 @@ $(element).on("CornerstoneImageRendered", function(event, detail) {
 
     // Get the contour for this slice from the server and draw it
     if (! stackContours[stack.currentImageIdIndex] ) {
-        $.get("contours.php", {imageID: 1, sliceIndex: stack.currentImageIdIndex+1}).done(function(data) {
+        $.get("contours.php", {imageID: imageID, sliceIndex: stack.currentImageIdIndex+1}).done(function(data) {
             var contours = $.parseJSON(data);
                 
             // Map json back to arrays
@@ -110,33 +116,10 @@ function onViewportUpdated(e, data) {
     var viewport = data.viewport;
     $('#mrbottomleft').text("WW/WC: " + Math.round(viewport.voi.windowWidth) + "/" + Math.round(viewport.voi.windowCenter));
     $('#zoomText').text("Zoom: " + viewport.scale.toFixed(2));
-    $("#sliceText").text("Image: " + (stack.currentImageIdIndex + 1) + "/" + NUM_SLICES);
+    $("#sliceText").text("Image: " + (stack.currentImageIdIndex + 1) + "/" + numSlices);
 };
 
 $(element).on("CornerstoneImageRendered", onViewportUpdated);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

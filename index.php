@@ -9,8 +9,16 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// Set image
+$imageID = 3;
+
+// Get image information
+$sql = "select * from images where id=$imageID";
+$result = $conn->query($sql);
+$img = mysqli_fetch_assoc($result);
+
 // Get all regions for this image
-$sql = "select * from regions where image_id=1 order by name asc";
+$sql = "select * from regions where image_id=$imageID order by name asc";
 $result = $conn->query($sql);
 $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
@@ -25,6 +33,12 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </head>
 
 <body>
+
+<?php
+    // Store image data in DOM for JS
+    echo "<div id='image-data' data-id='".$imageID."' data-name='".$img['name']."' data-baseName='".$img['basename']."' data-numSlices=".$img['numSlices']."></div>";
+?>
+
 <div class="container">
     <div class="row">
         <div class="col-md-6">
