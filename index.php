@@ -17,11 +17,12 @@ $sql = "select * from images where id=$imageID";
 $result = $conn->query($sql);
 $img = mysqli_fetch_assoc($result);
 
-// Get all regions for this image
-$sql = "select * from regions where image_id=$imageID order by name asc";
+// Get all enabled regions for this image
+$sql = "select * from regions where image_id=$imageID AND disabled=0 order by name asc";
 $result = $conn->query($sql);
 $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+$conn->close();
 ?>
 
 <!DOCTYPE HTML>
@@ -35,42 +36,56 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 <body>
 
 <div class="container">
+    <div class="row" id="description">
+      <blockquote>
+        <p><?= $img["description"] ?></p>
+      </blockquote>
+    </div>
     
     <div class="row">
         <div class="col-md-8">
-            <div id="dicomImageWrapper" style="width:700px;height:700px;position:relative;color: white;"
+
+            <ul class="nav nav-pills" id="toolbar">
+              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out" data-toggle="tooltip" data-placement="top" title="Zoom Out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
+            </ul>
+
+            <div id="dicomImageWrapper"
                  class="cornerstone-enabled-image"
                  oncontextmenu="return false"
                  unselectable='on'
                  onselectstart='return false;'
                  onmousedown='return false;'>
                 
-                <div id="dicomImage" oncontextmenu="return false"
-                     style="width:700px;height:700px;top:0px;left:0px; position:absolute">
-                    <div id="imgtopright" style="position: absolute;top:6px; right:3px">
+                <div id="dicomImage" oncontextmenu="return false" tabindex="0">
+                    <div id="imgtopleft">
+                      <div id="imgNameText"><?= $img["name"] ?></div>
+                    </div>
+                    <div id="imgtopright">
                         <div id="zoomText">Zoom: </div>
                         <div id="sliceText">Image: </div>
                     </div>
-                    <div id="imgbottomleft" style="position: absolute;bottom:3px; left:3px">
+                    <div id="imgbottomleft">
                         <div id="wwwcText">WW/WC: </div>
+                    </div>
+                    <div id="imgmiddleleft">
+                      <div>R</div>
+                    </div>
+
+                    <div id="imgmiddleright">
+                      <div>L</div>
                     </div>
                 </div>
             </div>
-
-            <ul class="nav nav-pills">
-              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="bottom" title="Pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="bottom" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
-            </ul>
-
 
         </div>
 
         <div id="legend">
             <div class="col-md-2">
                 <?php
-                    foreach(array_slice($regions,0,30) as $region) {
+                    foreach(array_slice($regions,0,15) as $region) {
                         echo "<div>";
                         echo "<div class='color-swatch' style='background-color: rgb(".$region["color"].");')></div>";
                         echo "<p>".$region["name"]."</p>";
@@ -81,7 +96,7 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
             <div class="col-md-2">
                 <?php
-                    foreach(array_slice($regions,22,-1) as $region) {
+                    foreach(array_slice($regions,16,-1) as $region) {
                         echo "<div>";
                         echo "<div class='color-swatch' style='background-color: rgb(".$region["color"].");')></div>";
                         echo "<p>".$region["name"]."</p>";

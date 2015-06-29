@@ -11,7 +11,7 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "select contours.points, contours.region_id, contours.sliceIndex, regions.color FROM contours inner join regions on contours.region_id=regions.id WHERE contours.image_id=$imageID order by contours.sliceIndex";
+$sql = "select contours.points, contours.region_id, contours.sliceIndex, regions.color FROM contours inner join regions on contours.region_id=regions.id WHERE contours.image_id=$imageID AND regions.disabled=0 order by contours.sliceIndex";
 
 $result = $conn->query($sql);
 $json = mysqli_fetch_all($result, MYSQLI_ASSOC);

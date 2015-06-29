@@ -62,24 +62,28 @@ function setupImage() {
         cornerstoneTools.addToolState(element, 'stack', stack);
 
         // Set the div to focused, so keypress events are handled
-        $(element).attr("tabindex", 0).focus();
+        $(element).focus();
 
         // Enable all tools we want to use with this element
         cornerstoneTools.stackScrollKeyboard.activate(element);
         // cornerstoneTools.stackScroll.activate(element, 1);
         cornerstoneTools.stackScrollWheel.activate(element);
 
-        cornerstoneTools.pan.activate(element, 1);
-        // cornerstoneTools.wwwc.activate(element, 1);
+        // cornerstoneTools.pan.activate(element, 1);
+        cornerstoneTools.wwwc.activate(element, 1);
         // cornerstoneTools.zoomWheel.activate(element);
         // cornerstoneTools.zoom.activate(element, 2);
 
         // Set default zoom scale
         viewport = cornerstone.getViewport(element);
-        viewport.scale = 2.5;
+        viewport.scale = 2.0;
         cornerstone.setViewport(element, viewport);
     });
 }
+
+$("#dicomImageWrapper").click(function() {
+    $(element).focus();
+});
 
 function drawContour(points, color, ctx) {
     // console.log('Drawing contour.');
@@ -155,5 +159,5 @@ $("#wwwc").click(function() {
 });
 
 $(function(){
-    $("[data-toggle='tooltip']").tooltip();
+    $("[data-toggle='tooltip']").tooltip({delay: {show: 1000, hide: 0}});
 });
