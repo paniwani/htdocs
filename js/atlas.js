@@ -10,7 +10,7 @@ var baseName = imgdata.basename;
 // Set up stack
 var imageIds = [];
 for (var i=1; i < numSlices+1; i++) {
-    imageIds.push("dicomweb:img/" + imageName + "/CT/" + baseName + "." + i + ".dcm");
+    imageIds.push("dicomweb:img/" + imageName + "/CT_clean/" + baseName + "." + i + ".dcm");
 };
 
 var stack = {

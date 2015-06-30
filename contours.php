@@ -1,5 +1,5 @@
 <?php
-require("config.php");
+require("../config.php");
 
 $imageID = isset($_GET['imageID']) ? $_GET['imageID'] : null;
 
