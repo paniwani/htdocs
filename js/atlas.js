@@ -14,10 +14,56 @@ for (var i=1; i < numSlices+1; i++) {
 };
 
 var stack = {
-    currentImageIdIndex : 40,
+    currentImageIdIndex : 0,
     imageIds: imageIds
 };
 
+
+
+// Stack loading
+var loadProgress = {"imageIds": stack.imageIds.slice(0),
+                "total": stack.imageIds.length,
+                "remaining": stack.imageIds.length,
+                "percentLoaded": 0,
+                };
+
+function onImageLoaded (event, args){
+    var imId = args.image.imageId;
+    var imIds = loadProgress["imageIds"];
+
+    // Remove all instances, in case the stack repeats imageIds
+    for(var i = imIds.length - 1; i >= 0; i--) {
+        if(imIds[i] === imId) {
+           imIds.splice(i, 1);
+        }
+    }
+
+    // Populate the load progress object
+    loadProgress["remaining"] = imIds.length;
+    loadProgress["percentLoaded"] = parseInt(100 - loadProgress["remaining"] / loadProgress["total"] * 100, 10);
+
+    if ((loadProgress["remaining"] / loadProgress["total"]) === 0) {
+        console.timeEnd("Stack Loading");
+    }
+
+    // Update progress bar in DOM
+    var pb = $("#progress-bar");
+    pb.attr("aria-valuenow", loadProgress["percentLoaded"]);
+    pb.width(loadProgress["percentLoaded"] + "%");
+    pb.html(loadProgress["percentLoaded"] + "%");
+    $("#progressText").html("Loaded: " + (loadProgress["total"] - loadProgress["remaining"]) + "/" + loadProgress["total"] + " images");
+
+    // When loading is complete, show the main content and hide the progress bar
+    if (loadProgress["percentLoaded"] == 100) {
+        $("#progressContainer").hide();
+        $("#mainContainer").css("visibility", "visible");
+    }
+
+}
+// Image loading events are bound to the cornerstone object, not the element
+$(cornerstone).on("CornerstoneImageLoaded", onImageLoaded);
+
+// Setup and get stack contours
 var stackContours = new Array(numSlices);
 for (var i=0; i<numSlices; i++) {
     stackContours[i] = new Array;
@@ -39,15 +85,18 @@ $.get("contours.php", {imageID: imageID}).done(function(data) {
         stackContours[c.sliceIndex-1].push(c);
     }
 
-    // Now that we have the whole stack
+    // Now that we have the whole contour stack
     // Setup the image
     setupImage();
 });
 
-// Enable the dicomImage element
-cornerstone.enable(element);
-
 function setupImage() {
+
+    // Enable the dicomImage element
+    console.time("Stack Loading");
+    cornerstone.enable(element);
+
+
     cornerstone.loadAndCacheImage(imageIds[stack.currentImageIdIndex]).then(function(image) {
         // Display the image
         cornerstone.displayImage(element, image);
@@ -74,7 +123,10 @@ function setupImage() {
         // cornerstoneTools.zoomWheel.activate(element);
         // cornerstoneTools.zoom.activate(element, 2);
 
-        // Set default zoom scale
+        // Prefetch the whole stack
+        cornerstoneTools.stackPrefetch.enable(element, 3);
+
+        // Set default zoom
         viewport = cornerstone.getViewport(element);
         viewport.scale = 2.0;
         cornerstone.setViewport(element, viewport);

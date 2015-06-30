@@ -39,11 +39,20 @@ $conn->close();
 
 <body>
 
-<div class="container">
+<div class="container" id="progressContainer">
+  <div class="progress">
+    <div class="progress-bar progress-bar-striped progress-bar-info active" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+      0%
+    </div>
+  </div>
+  <div id="progressText">
+    Loaded:
+  </div>
+</div>
+
+<div class="container" id="mainContainer">
     <div class="row" id="description">
-      <blockquote>
         <p><?= $img["description"] ?></p>
-      </blockquote>
     </div>
     
     <div class="row">

@@ -4,16 +4,16 @@ body {
 }
 
 #dicomImageWrapper {
-  width: 650px;
-  height: 650px;
+  width: 600px;
+  height: 600px;
   position: relative;
   color: white;
   outline: 0 none;
 }
 
 #dicomImage {
-  width: 650px;
-  height: 650px;
+  width: 600px;
+  height: 600px;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -72,3 +72,37 @@ body {
 button {
   display:inline-block;
 }
+
+#mainContainer {
+  visibility: hidden;
+}
+
+#progressContainer {
+  margin-top: 250px;
+}
+
+#description {
+  font-size: 18px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
