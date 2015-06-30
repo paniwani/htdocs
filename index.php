@@ -33,8 +33,8 @@ $conn->close();
 <html>
 <head>
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <link href="css/atlas.css" rel="stylesheet">
+    <title>Rad Onc Atlas</title>
 </head>
 
 <body>
@@ -91,6 +91,10 @@ $conn->close();
                       <div>L</div>
                     </div>
                 </div>
+            </div>
+
+            <div id="directions">
+              Use mouse or keyboard arrows up/down to scroll through images. 
             </div>
 
         </div>

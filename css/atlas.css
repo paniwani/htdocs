@@ -85,6 +85,11 @@ button {
   font-size: 18px;
 }
 
+#directions {
+  font-size: 10px;
+  color: gray;
+  margin-top: 5px;
+}
 
 
 
