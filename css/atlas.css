@@ -91,6 +91,19 @@ button {
   margin-top: 5px;
 }
 
+#legend label {
+  display: block;
+}
+
+.region {
+  width: 170px;
+  float:left;
+}
+
+.region .checkbox {
+  margin: 0;
+}
+
 
 
 

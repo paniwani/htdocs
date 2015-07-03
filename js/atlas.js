@@ -7,6 +7,10 @@ var numSlices = parseInt(imgdata.numslices);
 var imageName = imgdata.name;
 var baseName = imgdata.basename;
 
+// Do not draw certain regions
+var ignoreRegions = [];
+var highlightedRegion = 0;
+
 // Set up stack
 var imageIds = [];
 for (var i=1; i < numSlices+1; i++) {
@@ -137,8 +141,14 @@ $("#dicomImageWrapper").click(function() {
     $(element).focus();
 });
 
-function drawContour(points, color, ctx) {
+function drawContour(points, color, ctx, highlight) {
+
+    if (typeof(highlight)==='undefined') highlight = false;
+
     // console.log('Drawing contour.');
+
+    ctx.lineWidth = 1;
+
     ctx.strokeStyle = "rgba(" + color.join(",") + ", 1)";
 
     for (var i=0; i < points.length; i+=2) {
@@ -156,12 +166,31 @@ function drawContour(points, color, ctx) {
     // Close the contour
     ctx.closePath();
     ctx.stroke();
+
+    if (highlight == true) {
+        ctx.fillStyle = "rgba(" + color.join(",") + ", 0.5)";
+        ctx.fill();
+    }
+
+    
 };
 
 function drawContours(contours, ctx) {
+
     for (var i=0; i<contours.length; i++) {
         c = contours[i];
-        drawContour(c.points, c.color, ctx);
+        regionId = parseInt(c.region_id);
+
+        if (!_.contains(ignoreRegions, regionId)) {
+
+            if (regionId == highlightedRegion) {
+                drawContour(c.points, c.color, ctx, true);
+            } else {
+                drawContour(c.points, c.color, ctx, false);
+            }
+
+            
+        }
     } 
 };
 
@@ -171,7 +200,6 @@ $(element).on("CornerstoneImageRendered", function(event, detail) {
     // Setup drawing and get canvas context
     cornerstone.setToPixelCoordinateSystem(detail.enabledElement, detail.canvasContext);  
     var ctx = detail.canvasContext;
-    ctx.lineWidth = 1;
 
     // Get existing contour and draw it
     contours = stackContours[stack.currentImageIdIndex];
@@ -213,3 +241,66 @@ $("#wwwc").click(function() {
 $(function(){
     $("[data-toggle='tooltip']").tooltip({delay: {show: 1000, hide: 0}});
 });
+
+// Toggle on and off contours
+$("#legend input[type='checkbox']").click( function() {
+    regionId = parseInt($(this).parents('.region').get(0).dataset.id)
+    index = ignoreRegions.indexOf(regionId);
+
+    if( $(this).is(':checked') ) {
+        if (index > -1) {
+            ignoreRegions.splice(index,1);
+        }
+    } else {
+        ignoreRegions.push(regionId);
+    }
+    cornerstone.updateImage(element);
+});
+
+// Highlight active region on mouse over
+$("#legend .region").mouseenter(function() {
+    regionId = parseInt($(this).get(0).dataset.id);
+    highlightedRegion = regionId;
+    cornerstone.updateImage(element);
+});
+
+$("#legend .region").mouseleave(function() {
+    highlightedRegion = 0;
+    cornerstone.updateImage(element);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

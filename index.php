@@ -100,26 +100,26 @@ $conn->close();
         </div>
 
         <div id="legend">
-            <div class="col-md-2">
-                <?php
-                    foreach(array_slice($regions,0,15) as $region) {
-                        echo "<div>";
-                        echo "<div class='color-swatch' style='background-color: rgb(".$region["color"].");')></div>";
-                        echo "<p>".$region["name"]."</p>";
-                        echo "</div>";
-                    }
-                ?>
-            </div>
+            <div class="col-md-4">
 
-            <div class="col-md-2">
-                <?php
-                    foreach(array_slice($regions,16,-1) as $region) {
-                        echo "<div>";
-                        echo "<div class='color-swatch' style='background-color: rgb(".$region["color"].");')></div>";
-                        echo "<p>".$region["name"]."</p>";
-                        echo "</div>";
-                    }
-                ?>
+
+                <?php foreach($regions as $region): ?>
+
+                <div class="region" data-id=<?= $region['id'] ?>>
+
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" checked> 
+
+                      <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
+                      <p><?= $region["name"] ?></p>
+
+                    </label>
+                  </div>
+                  
+                </div>
+
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -140,6 +140,7 @@ $conn->close();
 <script src="js/jpx.min.js"></script>
 <script src="js/cornerstoneWADOImageLoader.min.js"></script>
 <script src="js/sizeof.min.js"></script>
+<script src="js/underscore.min.js"></script>
 <script src="js/atlas.js"></script>
 
 </html>
