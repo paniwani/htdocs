@@ -63,6 +63,10 @@ body {
   font-size:14px;
 }
 
+#legend label {
+  display: block;
+}
+
 body {
   overflow:hidden;
   -moz-overflow: hidden;
@@ -79,26 +83,23 @@ button {
 
 #progressContainer {
   margin-top: 250px;
+  width: 50%;
 }
 
 #description {
   font-size: 18px;
 }
 
-#directions {
+.directions p {
   font-size: 10px;
   color: gray;
-  margin-top: 5px;
+  margin: 5px 0 0 0;
 }
 
-#legend label {
-  display: block;
-}
-
-.region {
+/*.region {
   width: 170px;
   float:left;
-}
+}*/
 
 .region .checkbox {
   margin: 0;

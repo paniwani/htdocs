@@ -243,7 +243,7 @@ $(function(){
 });
 
 // Toggle on and off contours
-$("#legend input[type='checkbox']").click( function() {
+$("#legend input[type='checkbox']").change( function() {
     regionId = parseInt($(this).parents('.region').get(0).dataset.id)
     index = ignoreRegions.indexOf(regionId);
 

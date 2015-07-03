@@ -26,6 +26,17 @@ $sql = "select * from regions where image_id=$imageID AND disabled=0 order by na
 $result = $conn->query($sql);
 $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+// Sort regions by target vs OAR
+$regions_target = [];
+$regions_OAR = [];
+foreach ($regions as $region) {
+  if (preg_match("/(gtv)|(ctv)|(ptv)/i", $region["name"])) {
+    $regions_target[] = $region;
+  } else {
+    $regions_OAR[] = $region;
+  }
+}
+
 $conn->close();
 ?>
 
@@ -93,17 +104,23 @@ $conn->close();
                 </div>
             </div>
 
-            <div id="directions">
-              Use mouse or keyboard arrows up/down to scroll through images. 
+            <div class="directions">
+              <p>Use mouse or keyboard arrows up/down to scroll through images.</p>
+              <p>Scroll over labels to highlight contour.</p>
             </div>
 
         </div>
 
-        <div id="legend">
-            <div class="col-md-4">
+        <div class="col-md-4" id="legend">
+          <div class="row">
 
+            <div class="col-md-6" id="OAR-regions">
 
-                <?php foreach($regions as $region): ?>
+                <h5>OARs</h5>
+
+                <?php 
+                  foreach($regions_OAR as $region):
+                ?>
 
                 <div class="region" data-id=<?= $region['id'] ?>>
 
@@ -113,14 +130,43 @@ $conn->close();
 
                       <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
                       <p><?= $region["name"] ?></p>
-
                     </label>
                   </div>
                   
                 </div>
 
                 <?php endforeach; ?>
+
+
             </div>
+
+            <div class="col-md-6" id="target-regions">
+
+                <h5>Target Volumes</h5>
+
+                <?php 
+                  foreach($regions_target as $region):
+                ?>
+
+                <div class="region" data-id=<?= $region['id'] ?>>
+
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" checked> 
+
+                      <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
+                      <p><?= $region["name"] ?></p>
+                    </label>
+                  </div>
+                  
+                </div>
+
+                <?php endforeach; ?>
+
+
+            </div>
+
+          </div>
         </div>
     </div>
 </div>
