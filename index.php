@@ -185,6 +185,7 @@ $conn->close();
 <script src="js/dicomParser.min.js"></script>
 <script src="js/jpx.min.js"></script>
 <script src="js/cornerstoneWADOImageLoader.min.js"></script>
+<script src="js/cornerstoneWebImageLoader.min.js"></script>
 <script src="js/sizeof.min.js"></script>
 <script src="js/underscore.min.js"></script>
 <script src="js/atlas.js"></script>

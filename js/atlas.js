@@ -11,10 +11,14 @@ var baseName = imgdata.basename;
 var ignoreRegions = [];
 var highlightedRegion = 0;
 
+function pad(num, size){ return ('000000000' + num).substr(-size); }
+
 // Set up stack
 var imageIds = [];
 for (var i=1; i < numSlices+1; i++) {
-    imageIds.push("dicomweb:img/" + imageName + "/CT_clean/" + baseName + "." + i + ".dcm");
+    // imageIds.push("dicomweb:img/" + imageName + "/CT_clean/" + baseName + "." + i + ".dcm");
+    imageIds.push("dicomweb:img/osirix/compressed/IM-0001-" + pad(i,4) + ".dcm")
+    // imageIds.push("http://localhost:8888/atlas/img/osirix/jpg/IM-0001-" + pad(i,4) + ".jpg")
 };
 
 var stack = {
@@ -101,7 +105,7 @@ function setupImage() {
     cornerstone.enable(element);
 
 
-    cornerstone.loadAndCacheImage(imageIds[stack.currentImageIdIndex]).then(function(image) {
+    cornerstone.loadImage(imageIds[stack.currentImageIdIndex]).then(function(image) {
         // Display the image
         cornerstone.displayImage(element, image);
 
