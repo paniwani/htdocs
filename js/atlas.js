@@ -18,7 +18,7 @@ var imageIds = [];
 for (var i=1; i < numSlices+1; i++) {
     // imageIds.push("dicomweb:img/" + imageName + "/CT_clean/" + baseName + "." + i + ".dcm");
     // imageIds.push("dicomweb:img/osirix/compressed/IM-0001-" + pad(i,4) + ".dcm")
-    imageIds.push("http://localhost:8888/atlas/img/osirix/jpg/IM-0001-" + pad(i,4) + ".jpg")
+    imageIds.push("http://45.55.10.4/atlas/img/osirix/jpg/IM-0001-" + pad(i,4) + ".jpg")
 };
 
 var stack = {
