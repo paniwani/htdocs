@@ -243,7 +243,9 @@ function changeAllContours(regionType, flag) {
             }
         } else {
             $(input).prop("checked", false);
-            ignoreRegions.push(regionId);
+            if (index < 0) {
+                ignoreRegions.push(regionId);
+            }
         }
     }
     cornerstone.updateImage(element);
