@@ -180,6 +180,11 @@ $(document).ajaxComplete(function() {
     $("#TV_off").click(function()  { changeAllContours("TV", false); });
     $("#TV_on").click(function()   { changeAllContours("TV", true); });
 
+    // Re-focus for keyboard to work
+    $("body").click(function() {
+        $(element).focus();
+    });
+
     // Now that we have the whole contour stack, setup the load the image
     setupImage();
 });
@@ -212,6 +217,7 @@ function onImageProgressLoaded (event, args){
         console.timeEnd("Stack Loading");
         $("#progressContainer").hide();
         $("#mainContainer").css("visibility", "visible");
+        $(element).focus();
     }
 }
 
