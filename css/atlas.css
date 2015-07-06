@@ -9,6 +9,7 @@ body {
   position: relative;
   color: white;
   outline: 0 none;
+  margin: 0 auto;
 }
 
 #dicomImage {
@@ -17,7 +18,7 @@ body {
   position: absolute;
   top: 0px;
   left: 0px;
-  border: 3px dotted white;
+  /*border: 3px dotted white;*/
   outline: 0 none;
 }
 
@@ -103,6 +104,14 @@ button {
 
 .region .checkbox {
   margin: 0;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+#ww-presets {
+  margin-top: 5px;
 }
 
 

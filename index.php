@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Set image
-$imageID = isset($_GET['id']) ? $_GET['id'] : 1;
+$imageID = isset($_GET['id']) ? $_GET['id'] : 3;
 
 // Get image information
 $sql = "select * from images where id=$imageID";
@@ -27,11 +27,11 @@ $result = $conn->query($sql);
 $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Sort regions by target vs OAR
-$regions_target = [];
+$regions_TV = [];
 $regions_OAR = [];
 foreach ($regions as $region) {
   if (preg_match("/(gtv)|(ctv)|(ptv)/i", $region["name"])) {
-    $regions_target[] = $region;
+    $regions_TV[] = $region;
   } else {
     $regions_OAR[] = $region;
   }
@@ -104,11 +104,24 @@ $conn->close();
                 </div>
             </div>
 
-            <div class="directions">
-              <p>Use mouse or keyboard arrows up/down to scroll through images.</p>
-              <p>Scroll over labels to highlight contour.</p>
-            </div>
+            <div class="row">
+              <div class="col-md-8">
 
+                <div class="directions">
+                  <p>Use mouse or keyboard arrows up/down to scroll through images.</p>
+                  <p>Scroll over labels to highlight contour.</p>
+                </div>
+
+              </div>
+
+              <div class="col-md-4">
+                <div class="btn-group" role="group" id="ww-presets">
+                  <button type="button" class="btn btn-sm btn-default" id="tissue">Tissue</button>
+                  <button type="button" class="btn btn-sm btn-default" id="lung">Lung</button>
+                  <button type="button" class="btn btn-sm btn-default" id="bone">Bone</button>
+                </div>
+              </div>
+            </div>
         </div>
 
         <div class="col-md-4" id="legend">
@@ -140,12 +153,12 @@ $conn->close();
 
             </div>
 
-            <div class="col-md-6" id="target-regions">
+            <div class="col-md-6" id="TV-regions">
 
                 <h5>Target Volumes</h5>
 
                 <?php 
-                  foreach($regions_target as $region):
+                  foreach($regions_TV as $region):
                 ?>
 
                 <div class="region" data-id=<?= $region['id'] ?>>
@@ -167,14 +180,30 @@ $conn->close();
             </div>
 
           </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-default" id="OAR_on">On</button>
+                <button type="button" class="btn btn-sm btn-default" id="OAR_off">Off</button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-default" id="TV_on">On</button>
+                <button type="button" class="btn btn-sm btn-default" id="TV_off">Off</button>
+              </div>
+            </div>
+          </div>
+
+
         </div>
     </div>
 </div>
 
-<?php
-    // Store image data in DOM for JS
-    echo "<div id='image-data' data-id='".$imageID."' data-name='".$img['name']."' data-baseName='".$img['basename']."' data-numSlices=".$img['numSlices']."></div>";
-?>
+<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>"></div>
+
 </body>
 
 <script src="js/jquery.min.js"></script>
@@ -188,7 +217,8 @@ $conn->close();
 <script src="js/cornerstoneWebImageLoader.min.js"></script>
 <script src="js/sizeof.min.js"></script>
 <script src="js/underscore.min.js"></script>
-<script src="js/atlas.js"></script>
+<script src="js/utility.js"></script>
+<script src="atlas.js"></script>
 
 </html>
 
