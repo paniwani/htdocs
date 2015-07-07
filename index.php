@@ -16,6 +16,9 @@ if ($conn->connect_error) {
 // Set image
 $imageID = isset($_GET['id']) ? $_GET['id'] : 3;
 
+// Set loading mode
+$loadMode = isset($_GET['loadMode']) ? $_GET['loadMode'] : 'ORIGINAL';
+
 // Get image information
 $sql = "select * from images where id=$imageID";
 $result = $conn->query($sql);
@@ -202,7 +205,7 @@ $conn->close();
     </div>
 </div>
 
-<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>"></div>
+<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>"></div>
 
 </body>
 

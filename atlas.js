@@ -7,9 +7,6 @@ var stackContours = [];
 var loadProgress = {};
 var imageIds = [];
 
-var LOADMODE = "ORIGINAL"; // Set what type of images to load
-console.log("Load mode: " + LOADMODE);
-
 $(function() {
     element = $('#dicomImage').get(0);
 
@@ -18,16 +15,15 @@ $(function() {
 
     // Set up stack of images to load
     for (var i=1; i < imgdata.numslices + 1; i++) {
-        switch (LOADMODE) {
-            case "COMPRESSED":
-                imageIds.push("dicomweb:img/osirix/compressed/IM-0001-" + pad(i, 4) + ".dcm");
-                break;
-            case "JPEG":
-                imageIds.push(location.origin + "/atlas/img/osirix/jpg/IM-0001-" + pad(i, 4) + ".jpg");
+        var dir = "";
+        switch (imgdata.loadmode) {
+            case "J2K":
+                dir = "CT_j2k";
                 break;
             default:
-                imageIds.push("dicomweb:img/" + imgdata.name + "/CT/" + imgdata.basename + "." + i + ".dcm");
+                dir = "CT";
         }
+        imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
     };
 
     stack = {
