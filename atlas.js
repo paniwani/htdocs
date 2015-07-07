@@ -277,6 +277,8 @@ function setupImage() {
         // cornerstoneTools.zoom.activate(element, 2);
 
         // Prefetch the whole stack
+        var config = { "maxSimultaneousRequests" : imgdata.numrequests };
+        cornerstoneTools.stackPrefetch.setConfiguration(config);
         cornerstoneTools.stackPrefetch.enable(element, 3);
 
         // Set default viewport

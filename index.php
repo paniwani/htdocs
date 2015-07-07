@@ -19,6 +19,10 @@ $imageID = isset($_GET['id']) ? $_GET['id'] : 3;
 // Set loading mode
 $loadMode = isset($_GET['loadMode']) ? $_GET['loadMode'] : 'ORIGINAL';
 
+// Set maximum simultaneous requests
+// REMOVE LATER, ONLY FOR DEBUGGING
+$numRequests = isset($_GET['numRequests']) ? $_GET['numRequests'] : 11;
+
 // Get image information
 $sql = "select * from images where id=$imageID";
 $result = $conn->query($sql);
@@ -205,7 +209,7 @@ $conn->close();
     </div>
 </div>
 
-<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>"></div>
+<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>"></div>
 
 </body>
 
