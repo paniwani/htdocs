@@ -29,7 +29,6 @@ $(function() {
                 dir = "CT";
                 imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
         }
-        imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
     };
 
     stack = {
