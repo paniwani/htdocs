@@ -19,9 +19,14 @@ $(function() {
         switch (imgdata.loadmode) {
             case "J2K":
                 dir = "CT_j2k";
+                imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
                 break;
+            case "OSIRIX":
+                dir = "CT_osirix";
+                imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + "IM-0001-" + pad(i,4) + ".dcm");
             default:
                 dir = "CT";
+                imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
         }
         imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
     };
