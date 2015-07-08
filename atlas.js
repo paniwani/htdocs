@@ -24,6 +24,7 @@ $(function() {
             case "OSIRIX":
                 dir = "CT_osirix";
                 imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + "IM-0001-" + pad(i,4) + ".dcm");
+                break;
             default:
                 dir = "CT";
                 imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
