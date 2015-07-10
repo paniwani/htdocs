@@ -29,6 +29,10 @@ $(function() {
                 dir = "CT_jpeg";
                 imageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/" + dir + "/" + "IM-0001-" + pad(i,4) + ".jpg");
                 break;
+            case "JPEG2":
+                dir = "CT_jpeg2";
+                imageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".jpg");
+                break;
             default:
                 dir = "CT";
                 imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
