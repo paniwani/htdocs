@@ -37,17 +37,8 @@ function drawContours(contours, ctx) {
         regionId = c.region_id;
 
         if (!_.contains(ignoreRegions, regionId)) {
-
-            if (regionId == highlightedRegion) {
-
-                drawContour(c.points, c.color, ctx, true);
-
-            } else {
-
-                drawContour(c.points, c.color, ctx, false);
-
-            }
-
+            highlightFlag = (regionId == hoverRegion) || _.contains(highlightedRegions, regionId);
+            drawContour(c.points, c.color, ctx, highlightFlag);
         }
     } 
 }

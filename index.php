@@ -116,7 +116,7 @@ $conn->close();
 
                 <div class="directions">
                   <p>Use mouse or keyboard arrows up/down to scroll through images.</p>
-                  <p>Scroll over labels to highlight contour.</p>
+                  <p>Scroll over and click labels to highlight contour.</p>
                 </div>
 
               </div>
@@ -145,12 +145,10 @@ $conn->close();
                 <div class="region" data-id=<?= $region['id'] ?>>
 
                   <div class="checkbox">
-                    <label>
                       <input type="checkbox" checked> 
 
                       <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                      <p><?= $region["name"] ?></p>
-                    </label>
+                      <div class="regionName"><?= $region["name"] ?></div>
                   </div>
                   
                 </div>
@@ -171,12 +169,10 @@ $conn->close();
                 <div class="region" data-id=<?= $region['id'] ?>>
 
                   <div class="checkbox">
-                    <label>
                       <input type="checkbox" checked> 
 
                       <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                      <p><?= $region["name"] ?></p>
-                    </label>
+                      <div class="regionName"><?= $region["name"] ?></div>
                   </div>
                   
                 </div>

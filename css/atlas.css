@@ -114,6 +114,14 @@ button {
   margin-top: 5px;
 }
 
+.region {
+  width: 140px;
+  padding: 1px 0 1px 0;
+}
+
+.highlighted {
+  border: 1px white dashed;
+}
 
 
 

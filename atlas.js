@@ -1,7 +1,8 @@
 var element = {};
 var imgdata = {};
 var ignoreRegions = [];
-var highlightedRegion = 0;
+var highlightedRegions = [];
+var hoverRegion = 0;
 var stack = {};
 var stackContours = [];
 var loadProgress = {};
@@ -126,6 +127,7 @@ $(document).ajaxComplete(function() {
         cornerstoneTools.wwwc.activate(element, 1);
     });
 
+    // Tooltips
     $(function(){
         $("[data-toggle='tooltip']").tooltip({delay: {"show": 1000, "hide": 0}});
     });
@@ -135,7 +137,7 @@ $(document).ajaxComplete(function() {
     });
 
     // Toggle on and off contours
-    $("#legend input[type='checkbox']").change( function() {
+    $("#legend input[type='checkbox']").click( function() {
         regionId = parseInt($(this).parents('.region').get(0).dataset.id)
         index = ignoreRegions.indexOf(regionId);
 
@@ -152,13 +154,31 @@ $(document).ajaxComplete(function() {
     // Highlight active region on mouse over
     $("#legend .region").mouseenter(function() {
         regionId = parseInt($(this).get(0).dataset.id);
-        highlightedRegion = regionId;
+        hoverRegion = regionId;
         cornerstone.updateImage(element);
     });
 
     $("#legend .region").mouseleave(function() {
-        highlightedRegion = 0;
+        regionId = parseInt($(this).get(0).dataset.id);
+        hoverRegion = 0;
         cornerstone.updateImage(element);
+    });
+
+    $("#legend .regionName").click(function(e) {
+        regionId = parseInt($(this).parents('.region').get(0).dataset.id)
+
+        if (!_.contains(highlightedRegions, regionId)) {
+            highlightedRegions.push(regionId);
+            $(this).parents('.region').addClass('highlighted');
+            cornerstone.updateImage(element);
+        } else {
+            index = highlightedRegions.indexOf(regionId);
+            if (index > -1) {
+                highlightedRegions.splice(index, 1);
+                $(this).parents('.region').removeClass('highlighted');
+                cornerstone.updateImage(element);
+            }
+        }
     });
 
     // ww/wc presets
