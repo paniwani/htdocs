@@ -26,17 +26,10 @@ $(function() {
                 dir = "CT_osirix";
                 imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + "IM-0001-" + pad(i,4) + ".dcm");
                 break;
-            case "JPEG":
-                dir = "CT_jpeg";
-                imageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/" + dir + "/" + "IM-0001-" + pad(i,4) + ".jpg");
-                break;
-            case "JPEG2":
-                dir = "CT_jpeg2";
+            default:
+                dir = "CT_jpg";
                 imageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".jpg");
                 break;
-            default:
-                dir = "CT";
-                imageIds.push("dicomweb:img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".dcm");
         }
     };
 
@@ -61,17 +54,11 @@ $(function() {
         stackContours[i] = [];
     }
 
-    $.get("contours.php", {imageID: imgdata.id}).done(function(data) {
-        var contours = $.parseJSON(data);
-            
+    $.getJSON("img/" + imgdata.name + "/contours.json", function(data) {
+        var contours = data;
+
         for (var i=0; i<contours.length; i++) {
             c = contours[i];
-
-            // Clean up the JSON
-            c.points = c.points.split(",").map(Number);
-            c.color = c.color.split(",").map(Number);
-            c.sliceIndex = parseInt(c.sliceIndex);
-            c.region_id = parseInt(c.region_id);
 
             // Store it in the stack sorted by z index
             stackContours[c.sliceIndex - 1].push(c);
@@ -91,7 +78,7 @@ $(document).ajaxComplete(function() {
         // Setup drawing and get canvas context
         cornerstone.setToPixelCoordinateSystem(detail.enabledElement, detail.canvasContext);  
 
-        // Get existing contour and draw it
+        // Get existing contours and draw them
         contours = stackContours[stack.currentImageIdIndex];
         drawContours(contours, detail.canvasContext);
     });

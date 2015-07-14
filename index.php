@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Set image
-$imageID = isset($_GET['id']) ? $_GET['id'] : 3;
+$imageID = isset($_GET['id']) ? $_GET['id'] : 1;
 
 // Set loading mode
 $loadMode = isset($_GET['loadMode']) ? $_GET['loadMode'] : 'ORIGINAL';
@@ -142,7 +142,7 @@ $conn->close();
                   foreach($regions_OAR as $region):
                 ?>
 
-                <div class="region" data-id=<?= $region['id'] ?>>
+                <div class="region" data-id=<?= $region['ROINumber'] ?>>
 
                   <div class="checkbox">
                       <input type="checkbox" checked> 
@@ -166,7 +166,7 @@ $conn->close();
                   foreach($regions_TV as $region):
                 ?>
 
-                <div class="region" data-id=<?= $region['id'] ?>>
+                <div class="region" data-id=<?= $region['ROINumber'] ?>>
 
                   <div class="checkbox">
                       <input type="checkbox" checked> 

@@ -8,11 +8,13 @@ function drawContour(points, color, ctx, highlight) {
 
     ctx.lineWidth = 1;
 
-    ctx.strokeStyle = "rgba(" + color.join(",") + ", 1)";
+    ctx.strokeStyle = "rgba(" + color + ", 1)";
 
-    for (var i=0; i < points.length; i+=2) {
-        x = points[i];
-        y = points[i+1];
+    for (var i=0; i < points.length; i++) {
+        point = points[i];
+
+        x = point.x;
+        y = point.y;
 
         if (i == 0) {
             ctx.beginPath();
@@ -26,7 +28,7 @@ function drawContour(points, color, ctx, highlight) {
     ctx.stroke();
 
     if (highlight == true) {
-        ctx.fillStyle = "rgba(" + color.join(",") + ", 0.5)";
+        ctx.fillStyle = "rgba(" + color + ", 0.5)";
         ctx.fill();
     }
 }
@@ -34,7 +36,7 @@ function drawContour(points, color, ctx, highlight) {
 function drawContours(contours, ctx) {
     for (var i=0; i<contours.length; i++) {
         c = contours[i];
-        regionId = c.region_id;
+        regionId = c.ROINumber;
 
         if (!_.contains(ignoreRegions, regionId)) {
             highlightFlag = (regionId == hoverRegion) || _.contains(highlightedRegions, regionId);

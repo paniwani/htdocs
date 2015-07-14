@@ -1,27 +1,52 @@
 import sys
+import os
 import dicom
 import pdb
+import glob
 import MySQLdb
-from numpy import *
+import csv
+import shutil
+import json
+from RTStruct import RTStruct
 
 def usage():
-  print "usage: python load_dicom_dataset.py imageName imageBase RTstruct numSlices"
+  print "usage: python load_dicom_dataset.py input_directory output_directory"
 
-# Handle command line arguments
-if len(sys.argv)<5:
+# Argument handling
+if len(sys.argv)<2:
   usage()
   sys.exit(2)
 
-imageName, imageBase, RTstruct, numSlices = sys.argv[1:5]
-numSlices = int(numSlices)
+inDir = sys.argv[1]
+outDir = sys.argv[2]
 
-def patientPointToImagePixels(pointX, pointY, origin, spacing):
-  pointVector = array([pointX, pointY])
-  pointVector = subtract(pointVector, origin)
+# Get dataset
+datasets = os.walk(inDir).next()[1]
+dataset = datasets[0]
 
-  x = math.ceil( pointVector[0] / spacing )
-  y = math.ceil( pointVector[1] / spacing )
-  return [int(x),int(y)]
+# Get image file names
+os.chdir(inDir + "/" + dataset)
+image1 = glob.glob("*.1.dcm")[0]
+imageBaseName = image1.split(".1.dcm")[0]
+numSlices = len(glob.glob("CT*.dcm"))
+rtStructFile = glob.glob("RS*.dcm")[0]
+rtDoseFile = glob.glob("RD*.dcm")[0]
+
+print "Image 1: " + image1
+print "Number of slices: " + str(numSlices)
+print "RT Struct File Name: " + rtStructFile
+print "RT Dose File Name: " + rtDoseFile
+
+# Get image description
+description = ""
+with open('../description.txt', 'rU') as f:
+    reader = csv.reader(f, dialect='excel', delimiter='\t')
+    for row in reader:
+        if row[0] == dataset:
+          description = row[1]
+          break
+
+print "Image description: " + description
 
 # Connect to database
 db = MySQLdb.connect(host="localhost", # your host, usually localhost
@@ -32,63 +57,45 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 cur = db.cursor()
 
 # Get image information
-ds = dicom.read_file("img/" + imageName + "/CT/" + imageBase + ".1.dcm")
+ds = dicom.read_file(image1)
 numRows = ds.Rows
 numCols = ds.Columns
 pixelSpacing = float(ds.PixelSpacing[0])
-patientOrigin = [int(x) for x in ds.ImagePositionPatient[0:2]]
-patientOriginVector = array([patientOrigin[0], patientOrigin[1]])
+patientOrigin = [float(x) for x in ds.ImagePositionPatient[0:2]]
 
 # Save image information to databse
-cur.execute("INSERT INTO images (name, basename, numRows, numCols, numSlices, pixelSpacing) VALUES (%s, %s, %s, %s, %s, %s)", (imageName, imageBase, numRows, numCols, numSlices, pixelSpacing))
+cur.execute("INSERT INTO images (name, basename, numRows, numCols, numSlices, pixelSpacing, description) VALUES (%s, %s, %s, %s, %s, %s, %s)", (dataset, imageBaseName, numRows, numCols, numSlices, pixelSpacing, description))
 imageID = cur.lastrowid
 print "Saved image. ID: %s" % imageID
 
-# Read RT structure data
-ds = dicom.read_file("img/" + imageName + "/CT/" + RTstruct + ".dcm")
+# Convert image to jpeg and save to output directory
+dsDir = outDir + "/" + dataset
+if os.path.exists(dsDir):
+  sys.exit("Output dataset directory already exists")
+else:
+  os.makedirs(dsDir)
+  os.makedirs(dsDir + "/CT_jpg")
 
-# Get ROI names
-roi_sequence = ds.StructureSetROISequence
-roi = {}
-for r in roi_sequence:
-  roi[int(r.ROINumber)] = r.ROIName
+for im in glob.glob("CT*.dcm"):
+  imName = im.split(".dcm")[0]
+  os.system("dcmj2pnm +oj +Jq 90 +Ww 20 400 %s %s" % (im, imName + ".jpg"))
+  shutil.move(imName + ".jpg", dsDir + "/CT_jpg")
 
-# Get contour data
-for ROIContourSequence in ds.ROIContourSequence:
-  ReferencedROINumber = int(ROIContourSequence.ReferencedROINumber)
-  ROIDisplayColor = ','.join(str(x) for x in ROIContourSequence.ROIDisplayColor)
+print "Created jpeg images in output directory"
 
-  try: 
-    ROIContourSequence.ContourSequence
-  except AttributeError:
-    print "No contour sequence. Skipping this region."
-    continue
+# Get and save RT struct
+rtStruct = RTStruct(rtStructFile)
+rtStruct.convertPatientToPixelCoordinates(patientOrigin, pixelSpacing)
 
-  # Save ROI to database
-  cur.execute("INSERT INTO regions (image_id, name, color) VALUES (%s, %s, %s)", (imageID, roi[ReferencedROINumber], ROIDisplayColor))
-  regionID = cur.lastrowid
-  print "Saved region. ID: %s" % regionID
+for region in rtStruct.regions:
+  cur.execute("INSERT INTO regions (name, color, image_id, ROINumber) VALUES (%s, %s, %s, %s)", (region["name"], region["color"], imageID, region["ROINumber"]))
 
-  for ContourSequence in ROIContourSequence.ContourSequence:
-    ContourData = [float(x) for x in ContourSequence.ContourData]
+print "Saved regions to database"
 
-    # Remove z coordinates
-    del ContourData[2::3]
+with open(dsDir + "/contours.json", "w") as outfile:
+  json.dump(rtStruct.contours, outfile)
 
-    cd = []
-    for i in range(0, len(ContourData), 2):
-      point = patientPointToImagePixels(ContourData[i], ContourData[i+1], patientOriginVector, pixelSpacing)
-      cd.extend(point)
-    cd = ','.join(str(x) for x in cd)
-
-    imageSlice = str(ContourSequence.ContourImageSequence[0].ReferencedSOPInstanceUID)
-    sliceIndex = imageSlice.split('.')[-1]
-
-    # Save contour data to database
-    cur.execute("INSERT INTO contours (region_id, image_id, sliceIndex, points) VALUES (%s, %s, %s, %s)", (regionID, imageID, sliceIndex, cd))
-    # print ("Saved contour. ID: %s" % cur.lastrowid),
-
-    
+print "Save contours.json to output directory"
 
 # Close database
 db.commit()

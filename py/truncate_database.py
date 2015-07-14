@@ -8,10 +8,9 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor()
 
-# Clear database first
+# Clear database
 cur.execute("TRUNCATE TABLE images")
 cur.execute("TRUNCATE TABLE regions")
-cur.execute("TRUNCATE TABLE contours")
 print "Database cleared."
 
 db.commit()

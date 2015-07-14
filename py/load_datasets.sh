@@ -1,5 +1,4 @@
 #!/bin/bash          
 python truncate_database.py
-python load_dicom_dataset.py BP_30056267 CT.1.2.840.113619.2.55.3.346865037.294.1409320864.82 RS.1.2.246.352.71.4.1595298118.234058.20140911161601 206
-python load_dicom_dataset.py RL_12344065 CT.1.2.840.113619.2.55.3.346865037.607.1399470496.870 RS.1.2.246.352.71.4.1595298118.212508.20140526150842 154
-python load_dicom_dataset.py SC_12812830 CT.1.2.840.113619.2.55.3.346865037.382.1391179415.995 RS.1.2.246.352.71.4.1595298118.195434.20140213095459 187
+rm -rf /Applications/MAMP/htdocs/atlas/img/*
+python load_dicom_dataset.py "/Users/neil/Desktop/dataset" "/Applications/MAMP/htdocs/atlas/img"
