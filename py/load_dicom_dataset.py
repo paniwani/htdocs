@@ -7,7 +7,9 @@ import MySQLdb
 import csv
 import shutil
 import json
+import SimpleITK as sitk
 from RTStruct import RTStruct
+from RTDose import RTDose
 
 def usage():
   print "usage: python load_dicom_dataset.py input_directory output_directory"
@@ -66,10 +68,10 @@ patientOrigin = [float(x) for x in ds.ImagePositionPatient[0:2]]
 # Save image information to databse
 cur.execute("INSERT INTO images (name, basename, numRows, numCols, numSlices, pixelSpacing, description) VALUES (%s, %s, %s, %s, %s, %s, %s)", (dataset, imageBaseName, numRows, numCols, numSlices, pixelSpacing, description))
 imageID = cur.lastrowid
-print "Saved image. ID: %s" % imageID
+print "Saved image to database"
 
 # Convert image to jpeg and save to output directory
-dsDir = outDir + "/" + dataset
+dsDir = os.path.join(outDir, dataset)
 if os.path.exists(dsDir):
   sys.exit("Output dataset directory already exists")
 else:
@@ -81,7 +83,7 @@ for im in glob.glob("CT*.dcm"):
   os.system("dcmj2pnm +oj +Jq 90 +Ww 20 400 %s %s" % (im, imName + ".jpg"))
   shutil.move(imName + ".jpg", dsDir + "/CT_jpg")
 
-print "Created jpeg images in output directory"
+print "Converted dicom to jpeg"
 
 # Get and save RT struct
 rtStruct = RTStruct(rtStructFile)
@@ -95,7 +97,18 @@ print "Saved regions to database"
 with open(dsDir + "/contours.json", "w") as outfile:
   json.dump(rtStruct.contours, outfile)
 
-print "Save contours.json to output directory"
+print "Saved contours.json"
+
+# Get and save RT dose
+if os.path.exists(os.path.join(dsDir, "Dose")):
+  sys.exit("Dose directory already exists")
+else:
+  os.makedirs(os.path.join(dsDir, "Dose"))
+
+rtDose = RTDose(os.path.join(inDir, dataset))
+sitk.WriteImage(rtDose.image, [os.path.join(dsDir, "Dose", "dose.{0}.jpg".format(i)) for i in range(rtDose.image.GetSize()[2], 0, -1)], True)
+
+print "Saved dose files as jpeg"
 
 # Close database
 db.commit()

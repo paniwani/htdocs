@@ -83,6 +83,10 @@ $conn->close();
               <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
             </ul>
 
+            <ul class="nav nav-pills" id="doseBtn">
+              <li><button type="button" class="btn btn-primary navbar-btn">Dose</button></li>
+            </ul>
+
             <div id="dicomImageWrapper"
                  class="cornerstone-enabled-image"
                  oncontextmenu="return false"
@@ -203,7 +207,14 @@ $conn->close();
 
         </div>
     </div>
+
+    <div class="row">
+      <div id="doseImage"></div>
+      <canvas id="canvasTemp" width="512" height="512"></canvas>
+    </div>
 </div>
+
+
 
 <div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>"></div>
 
@@ -220,6 +231,7 @@ $conn->close();
 <script src="js/cornerstoneWebImageLoader.min.js"></script>
 <script src="js/sizeof.min.js"></script>
 <script src="js/underscore.min.js"></script>
+<script src="js/bundle.js"></script>
 <script src="js/utility.js"></script>
 <script src="atlas.js"></script>
 

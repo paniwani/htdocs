@@ -8,8 +8,14 @@ var stackContours = [];
 var loadProgress = {};
 var imageIds = [];
 
+var doseElement = {};
+var doseImageIds = [];
+var doseStack = {};
+var doseOn = false;
+
 $(function() {
     element = $('#dicomImage').get(0);
+    doseElement = $('#doseImage').get(0);
 
     // Get image information from DOM
     imgdata = $('#image-data').data();
@@ -33,9 +39,18 @@ $(function() {
         }
     };
 
+    for (var i=1; i < imgdata.numslices + 1; i++) {
+        doseImageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/Dose/" + "dose." + i + ".jpg");
+    }
+
     stack = {
         currentImageIdIndex : 0,
         imageIds: imageIds
+    };
+
+    doseStack = {
+        currentImageIdIndex: 0,
+        imageIds: doseImageIds
     };
 
     // Setup stack progress loader
@@ -63,146 +78,153 @@ $(function() {
             // Store it in the stack sorted by z index
             stackContours[c.sliceIndex - 1].push(c);
         }
-    });
-});
+    })
+    .done(function() {
 
-$(document).ajaxComplete(function() {
-    console.log("Retrieved contours from database.");
+        console.log("Retrieved contours from database.");
 
-    //-------------------------------------------
-    // EVENTS
-    //-------------------------------------------
+        //-------------------------------------------
+        // EVENTS
+        //-------------------------------------------
 
-    // Draw the contours when image is rendered
-    $(element).on("CornerstoneImageRendered", function(event, detail) {
-        // Setup drawing and get canvas context
-        cornerstone.setToPixelCoordinateSystem(detail.enabledElement, detail.canvasContext);  
+        // Draw the contours and dose
+        $(element).on("CornerstoneImageRendered", function(event, detail) {
+            ctx = detail.canvasContext;
+            cornerstone.setToPixelCoordinateSystem(detail.enabledElement, ctx);  
 
-        // Get existing contours and draw them
-        contours = stackContours[stack.currentImageIdIndex];
-        drawContours(contours, detail.canvasContext);
-    });
+            if (doseOn) { drawDose(ctx); }
+            drawContours(stackContours[stack.currentImageIdIndex], ctx);
+        });
 
-    // Update viewport when image is rendered
-    $(element).on("CornerstoneImageRendered", function(event, detail) {
-        var viewport = detail.viewport;
-        $('#wwwcText').text("WW/WC: " + Math.round(viewport.voi.windowWidth) + "/" + Math.round(viewport.voi.windowCenter));
-        $('#zoomText').text("Zoom: " + viewport.scale.toFixed(2));
-        $("#sliceText").text("Image: " + (stack.currentImageIdIndex + 1) + "/" + imgdata.numslices);
-    });
+        // Update viewport when image is rendered
+        $(element).on("CornerstoneImageRendered", function(event, detail) {
+            var viewport = detail.viewport;
+            $('#wwwcText').text("WW/WC: " + Math.round(viewport.voi.windowWidth) + "/" + Math.round(viewport.voi.windowCenter));
+            $('#zoomText').text("Zoom: " + viewport.scale.toFixed(2));
+            $("#sliceText").text("Image: " + (stack.currentImageIdIndex + 1) + "/" + imgdata.numslices);
+        });
 
-    // Toolbar
-    $("#zoom-in").click(function() {
-        viewport = cornerstone.getViewport(element);
-        viewport.scale += 0.5;
-        cornerstone.setViewport(element, viewport);
-    });
+        // Toolbar
+        $("#zoom-in").click(function() {
+            viewport = cornerstone.getViewport(element);
+            viewport.scale += 0.5;
+            cornerstone.setViewport(element, viewport);
+        });
 
-    $("#zoom-out").click(function() {
-        viewport = cornerstone.getViewport(element);
-        viewport.scale -= 0.5;
-        cornerstone.setViewport(element, viewport);
-    });  
-
-    $("#pan").click(function() {
-        cornerstoneTools.pan.activate(element, 1);
-        cornerstoneTools.wwwc.deactivate(element, 1);
-    });
-
-    $("#wwwc").click(function() {
-        cornerstoneTools.pan.deactivate(element, 1);
-        cornerstoneTools.wwwc.activate(element, 1);
-    });
-
-    // Tooltips
-    $(function(){
-        $("[data-toggle='tooltip']").tooltip({delay: {"show": 1000, "hide": 0}});
-    });
-
-    $("[data-toggle='tooltip']").on("click", function() {
-        $(this).tooltip('hide');
-    });
-
-    // Toggle on and off contours
-    $("#legend input[type='checkbox']").click( function() {
-        regionId = parseInt($(this).parents('.region').get(0).dataset.id)
-        index = ignoreRegions.indexOf(regionId);
-
-        if( $(this).is(':checked') ) {
-            if (index > -1) {
-                ignoreRegions.splice(index,1);
+        $("#zoom-out").click(function() {
+            viewport = cornerstone.getViewport(element);
+            if (viewport.scale > 0.5) {
+                viewport.scale -= 0.5;
+                cornerstone.setViewport(element, viewport);
             }
-        } else {
-            ignoreRegions.push(regionId);
-        }
-        cornerstone.updateImage(element);
-    });
+        });  
 
-    // Highlight active region on mouse over
-    $("#legend .region").mouseenter(function() {
-        regionId = parseInt($(this).get(0).dataset.id);
-        hoverRegion = regionId;
-        cornerstone.updateImage(element);
-    });
+        $("#pan").click(function() {
+            cornerstoneTools.pan.activate(element, 1);
+            cornerstoneTools.wwwc.deactivate(element, 1);
+        });
 
-    $("#legend .region").mouseleave(function() {
-        regionId = parseInt($(this).get(0).dataset.id);
-        hoverRegion = 0;
-        cornerstone.updateImage(element);
-    });
+        $("#wwwc").click(function() {
+            cornerstoneTools.pan.deactivate(element, 1);
+            cornerstoneTools.wwwc.activate(element, 1);
+        });
 
-    $("#legend .regionName").click(function(e) {
-        regionId = parseInt($(this).parents('.region').get(0).dataset.id)
-
-        if (!_.contains(highlightedRegions, regionId)) {
-            highlightedRegions.push(regionId);
-            $(this).parents('.region').addClass('highlighted');
+        $("#doseBtn button").click(function() {
+            doseOn = !doseOn;
+            $("#doseBtn button").toggleClass("active");
             cornerstone.updateImage(element);
-        } else {
-            index = highlightedRegions.indexOf(regionId);
-            if (index > -1) {
-                highlightedRegions.splice(index, 1);
-                $(this).parents('.region').removeClass('highlighted');
-                cornerstone.updateImage(element);
+        });
+
+        // Tooltips
+        $(function(){
+            $("[data-toggle='tooltip']").tooltip({delay: {"show": 1000, "hide": 0}});
+        });
+
+        $("[data-toggle='tooltip']").on("click", function() {
+            $(this).tooltip('hide');
+        });
+
+        // Toggle on and off contours
+        $("#legend input[type='checkbox']").click( function() {
+            regionId = parseInt($(this).parents('.region').get(0).dataset.id)
+            index = ignoreRegions.indexOf(regionId);
+
+            if( $(this).is(':checked') ) {
+                if (index > -1) {
+                    ignoreRegions.splice(index,1);
+                }
+            } else {
+                ignoreRegions.push(regionId);
             }
-        }
+            cornerstone.updateImage(element);
+        });
+
+        // Highlight active region on mouse over
+        $("#legend .region").mouseenter(function() {
+            regionId = parseInt($(this).get(0).dataset.id);
+            hoverRegion = regionId;
+            cornerstone.updateImage(element);
+        });
+
+        $("#legend .region").mouseleave(function() {
+            regionId = parseInt($(this).get(0).dataset.id);
+            hoverRegion = 0;
+            cornerstone.updateImage(element);
+        });
+
+        $("#legend .regionName").click(function(e) {
+            regionId = parseInt($(this).parents('.region').get(0).dataset.id)
+
+            if (!_.contains(highlightedRegions, regionId)) {
+                highlightedRegions.push(regionId);
+                $(this).parents('.region').addClass('highlighted');
+                cornerstone.updateImage(element);
+            } else {
+                index = highlightedRegions.indexOf(regionId);
+                if (index > -1) {
+                    highlightedRegions.splice(index, 1);
+                    $(this).parents('.region').removeClass('highlighted');
+                    cornerstone.updateImage(element);
+                }
+            }
+        });
+
+        // ww/wc presets
+        $('#tissue').click(function(e) {
+            var viewport = cornerstone.getViewport(element);
+            viewport.voi.windowWidth = 400;
+            viewport.voi.windowCenter = 20;
+            cornerstone.setViewport(element, viewport);
+        });
+
+        $('#lung').click(function(e) {
+            var viewport = cornerstone.getViewport(element);
+            viewport.voi.windowWidth = 1600;
+            viewport.voi.windowCenter = -600;
+            cornerstone.setViewport(element, viewport);
+        });
+
+        $('#bone').click(function(e) {
+            var viewport = cornerstone.getViewport(element);
+            viewport.voi.windowWidth = 2000;
+            viewport.voi.windowCenter = 300;
+            cornerstone.setViewport(element, viewport);
+        });
+
+        // On/Off OARs and TVs
+        $("#OAR_off").click(function() { changeAllContours("OAR", false); });
+        $("#OAR_on").click(function()  { changeAllContours("OAR", true); });
+        $("#TV_off").click(function()  { changeAllContours("TV", false); });
+        $("#TV_on").click(function()   { changeAllContours("TV", true); });
+
+        // Re-focus for keyboard to work
+        $("body").click(function() {
+            $(element).focus();
+        });
+
+        // Now that we have the whole contour stack, setup and load the image
+        setupImage();
     });
-
-    // ww/wc presets
-    $('#tissue').click(function(e) {
-        var viewport = cornerstone.getViewport(element);
-        viewport.voi.windowWidth = 400;
-        viewport.voi.windowCenter = 20;
-        cornerstone.setViewport(element, viewport);
-    });
-
-    $('#lung').click(function(e) {
-        var viewport = cornerstone.getViewport(element);
-        viewport.voi.windowWidth = 1600;
-        viewport.voi.windowCenter = -600;
-        cornerstone.setViewport(element, viewport);
-    });
-
-    $('#bone').click(function(e) {
-        var viewport = cornerstone.getViewport(element);
-        viewport.voi.windowWidth = 2000;
-        viewport.voi.windowCenter = 300;
-        cornerstone.setViewport(element, viewport);
-    });
-
-    // On/Off OARs and TVs
-    $("#OAR_off").click(function() { changeAllContours("OAR", false); });
-    $("#OAR_on").click(function()  { changeAllContours("OAR", true); });
-    $("#TV_off").click(function()  { changeAllContours("TV", false); });
-    $("#TV_on").click(function()   { changeAllContours("TV", true); });
-
-    // Re-focus for keyboard to work
-    $("body").click(function() {
-        $(element).focus();
-    });
-
-    // Now that we have the whole contour stack, setup the load the image
-    setupImage();
 });
 
 function onImageProgressLoaded (event, args){
@@ -270,8 +292,11 @@ function changeAllContours(regionType, flag) {
 function setupImage() {
     // Enable the dicomImage element
     cornerstone.enable(element);
+    cornerstone.enable(doseElement);
 
-    cornerstone.loadImage(imageIds[stack.currentImageIdIndex]).then(function(image) {
+    var synchronizer = new cornerstoneTools.Synchronizer("CornerstoneNewImage", cornerstoneTools.stackImageIndexSynchronizer);
+
+    cornerstone.loadImage(imageIds[0]).then(function(image) {
         // Display the image
         cornerstone.displayImage(element, image);
 
@@ -285,7 +310,7 @@ function setupImage() {
         cornerstoneTools.addToolState(element, 'stack', stack);
 
         // Set the div to focused, so keypress events are handled
-        $(element).focus();
+        // $(element).focus();
 
         // Enable all stack tools we want to use with this element
         cornerstoneTools.stackScrollKeyboard.activate(element);
@@ -309,5 +334,31 @@ function setupImage() {
             y: 33.2
         };
         cornerstone.setViewport(element, viewport);
+
+        synchronizer.add(element);
     });
+
+    cornerstone.loadImage(doseImageIds[0]).then(function(doseImage) {
+        // cornerstone.displayImage(doseElement, doseImage);
+
+        // Enable mouse and keyboard inputs
+        cornerstoneTools.keyboardInput.enable(doseElement);
+        cornerstoneTools.mouseInput.enable(doseElement);
+        cornerstoneTools.mouseWheelInput.enable(doseElement);
+
+        // Set the stack as tool state
+        cornerstoneTools.addStackStateManager(doseElement, ['stack']);
+        cornerstoneTools.addToolState(doseElement, 'stack', doseStack);
+
+        cornerstoneTools.stackScrollKeyboard.activate(doseElement);
+        cornerstoneTools.stackScrollWheel.activate(doseElement);
+
+        cornerstoneTools.stackPrefetch.enable(doseElement, 3);
+
+        synchronizer.add(doseElement);
+
+
+    });
+
+    
 }

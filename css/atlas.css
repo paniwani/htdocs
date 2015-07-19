@@ -9,7 +9,18 @@ body {
   position: relative;
   color: white;
   outline: 0 none;
-  margin: 0 auto;
+  margin: 0 75px 0 75px;
+  clear: both;
+}
+
+#toolbar {
+  float: left;
+  margin-left: 75px;
+}
+
+#doseBtn {
+  float: right;
+  margin-right: 75px;
 }
 
 #dicomImage {
@@ -20,6 +31,16 @@ body {
   left: 0px;
   /*border: 3px dotted white;*/
   outline: 0 none;
+}
+
+#doseImage {
+  width: 600px;
+  height: 600px;
+  display: none;
+}
+
+#canvasTemp {
+  display: none;
 }
 
 #imgtopright {
