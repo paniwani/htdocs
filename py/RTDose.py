@@ -39,6 +39,15 @@ class RTDose(object):
     doseImage.SetSpacing(spacing)
     doseArray = sitk.GetArrayFromImage(doseImage)
 
+    # Get dose min/max
+    minMaxFilter = sitk.MinimumMaximumImageFilter()
+    minMaxFilter.Execute(doseImage)
+    minimum = minMaxFilter.GetMinimum()
+    maximum = minMaxFilter.GetMaximum()
+    self.maximum = maximum
+
+    print "Dose maximum: " + str(maximum)
+
     # print "Dose origin: " + str(doseImage.GetOrigin())
     # print "Dose direction: " + str(doseImage.GetDirection())
 

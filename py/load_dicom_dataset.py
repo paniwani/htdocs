@@ -108,6 +108,8 @@ else:
 rtDose = RTDose(os.path.join(inDir, dataset))
 sitk.WriteImage(rtDose.image, [os.path.join(dsDir, "Dose", "dose.{0}.jpg".format(i)) for i in range(rtDose.image.GetSize()[2], 0, -1)], True)
 
+cur.execute("UPDATE images SET doseMaximum=%s WHERE id=%s", (rtDose.maximum, imageID)) 
+
 print "Saved dose files as jpeg"
 
 # Close database

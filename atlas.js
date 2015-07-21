@@ -1,19 +1,20 @@
-var element = {};
-var imgdata = {};
-var ignoreRegions = [];
-var highlightedRegions = [];
-var hoverRegion = 0;
+var element, doseElement;
 var stack = {};
-var stackContours = [];
-var loadProgress = {};
-var imageIds = [];
-
-var doseElement = {};
-var doseImageIds = [];
 var doseStack = {};
-var doseOn = false;
+var loadProgress = {};
 
 $(function() {
+    var imgdata = {};
+    var ignoreRegions = [];
+    var highlightedRegions = [];
+    var hoverRegion = 0;
+    var stackContours = [];
+    var imageIds = [];
+
+    var doseImageIds = [];
+    var doseOn = false;
+    var doseThreshold = 2;
+
     element = $('#dicomImage').get(0);
     doseElement = $('#doseImage').get(0);
 
@@ -52,6 +53,11 @@ $(function() {
         currentImageIdIndex: 0,
         imageIds: doseImageIds
     };
+
+    // Setup color map
+    var cm = require('colormap');
+    var colormap = cm( { colormap: "jet", nshades: 256, format: "rgba", alpha: 0.5 } );
+    colormap.splice(-1, 1); colormap.splice(0, 1);
 
     // Setup stack progress loader
     loadProgress = {
@@ -92,8 +98,8 @@ $(function() {
             ctx = detail.canvasContext;
             cornerstone.setToPixelCoordinateSystem(detail.enabledElement, ctx);  
 
-            if (doseOn) { drawDose(ctx); }
-            drawContours(stackContours[stack.currentImageIdIndex], ctx);
+            if (doseOn) { drawDose(ctx, colormap, doseThreshold, imgdata.dosemaximum); }
+            drawContours(ctx, stackContours[stack.currentImageIdIndex], ignoreRegions, highlightedRegions, hoverRegion) 
         });
 
         // Update viewport when image is rendered
@@ -129,9 +135,39 @@ $(function() {
             cornerstoneTools.wwwc.activate(element, 1);
         });
 
-        $("#doseBtn button").click(function() {
+        $("#doseSwitch").bootstrapSwitch({
+            size: "small",
+            labelText: "Dose"
+        });
+
+        $("#doseSwitch").on('switchChange.bootstrapSwitch', function(event, state) {
             doseOn = !doseOn;
-            $("#doseBtn button").toggleClass("active");
+            $("#doseSliderDiv").visibilityToggle();
+            cornerstone.updateImage(element);
+        });
+
+        var doseMax = imgdata.dosemaximum;
+        var ticks = _.range(0, doseMax, 10);
+        if ( (doseMax % 10) !== 0 ) { ticks.push(doseMax) }
+        
+        var ticksStrings = [];
+        for (var i=0; i < ticks.length; i++) {
+            ticksStrings.push( ticks[i] + " Gy");
+        }
+        ticksStrings.reverse();
+        ticks[0] = 2; // Default minimum threshold
+
+        // Dose slider
+        $("#doseSlider").slider({
+            id: "doseSlider",
+            orientation: "vertical",
+            reversed: true,
+            ticks: ticks,
+            ticks_labels: ticksStrings,
+            value: doseThreshold,
+            tooltip: "hide"
+        }).on("slideStop", function(data) {
+            doseThreshold = data.value;
             cornerstone.updateImage(element);
         });
 
@@ -212,10 +248,10 @@ $(function() {
         });
 
         // On/Off OARs and TVs
-        $("#OAR_off").click(function() { changeAllContours("OAR", false); });
-        $("#OAR_on").click(function()  { changeAllContours("OAR", true); });
-        $("#TV_off").click(function()  { changeAllContours("TV", false); });
-        $("#TV_on").click(function()   { changeAllContours("TV", true); });
+        $("#OAR_off").click(function() { changeAllContours("OAR", false, ignoreRegions); });
+        $("#OAR_on").click(function()  { changeAllContours("OAR", true, ignoreRegions); });
+        $("#TV_off").click(function()  { changeAllContours("TV", false, ignoreRegions); });
+        $("#TV_on").click(function()   { changeAllContours("TV", true, ignoreRegions); });
 
         // Re-focus for keyboard to work
         $("body").click(function() {
@@ -259,7 +295,7 @@ function onImageProgressLoaded (event, args){
     }
 }
 
-function changeAllContours(regionType, flag) {
+function changeAllContours(regionType, flag, ignoreRegions) {
     var el;
     if (regionType == "OAR") {
         el = $("#OAR-regions");
@@ -296,7 +332,7 @@ function setupImage() {
 
     var synchronizer = new cornerstoneTools.Synchronizer("CornerstoneNewImage", cornerstoneTools.stackImageIndexSynchronizer);
 
-    cornerstone.loadImage(imageIds[0]).then(function(image) {
+    cornerstone.loadImage(stack.imageIds[0]).then(function(image) {
         // Display the image
         cornerstone.displayImage(element, image);
 
@@ -322,8 +358,6 @@ function setupImage() {
         // cornerstoneTools.zoom.activate(element, 2);
 
         // Prefetch the whole stack
-        var config = { "maxSimultaneousRequests" : imgdata.numrequests };
-        cornerstoneTools.stackPrefetch.setConfiguration(config);
         cornerstoneTools.stackPrefetch.enable(element, 3);
 
         // Set default viewport
@@ -338,7 +372,7 @@ function setupImage() {
         synchronizer.add(element);
     });
 
-    cornerstone.loadImage(doseImageIds[0]).then(function(doseImage) {
+    cornerstone.loadImage(doseStack.imageIds[0]).then(function(doseImage) {
         // cornerstone.displayImage(doseElement, doseImage);
 
         // Enable mouse and keyboard inputs
