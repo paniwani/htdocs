@@ -35,13 +35,13 @@ $(function() {
                 break;
             default:
                 dir = "CT_jpg";
-                imageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".jpg");
+                imageIds.push(location.origin + "/img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".jpg");
                 break;
         }
     };
 
     for (var i=1; i < imgdata.numslices + 1; i++) {
-        doseImageIds.push(location.origin + "/atlas/img/" + imgdata.name + "/Dose/" + "dose." + i + ".jpg");
+        doseImageIds.push(location.origin + "/img/" + imgdata.name + "/Dose/" + "dose." + i + ".jpg");
     }
 
     stack = {
