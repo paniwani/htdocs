@@ -85,6 +85,16 @@ for im in glob.glob("CT*.dcm"):
 
 print "Converted dicom to jpeg"
 
+# Load patient CT in simple ITK
+# Setup patient image in itk
+reader = sitk.ImageSeriesReader()
+filenames = sorted(glob.glob("CT*.dcm"))
+files = []
+for i in range(numSlices, 0, -1): # Load images in descending order in order to get correct origin
+  files.append(imageBaseName + "." + str(i) + ".dcm")
+reader.SetFileNames(files)
+image = reader.Execute()
+
 # Get and save RT struct
 rtStruct = RTStruct(rtStructFile)
 rtStruct.convertPatientToPixelCoordinates(patientOrigin, pixelSpacing)
