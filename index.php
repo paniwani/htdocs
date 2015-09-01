@@ -1,283 +1,123 @@
 <?php
-require("../config.php");
 
-ini_set('display_startup_errors',1);
-ini_set('display_errors',1);
-error_reporting(-1);
+/**
+ * A simple, clean and secure PHP Login Script / MINIMAL VERSION
+ * For more versions (one-file, advanced, framework-like) visit http://www.php-login.net
+ *
+ * Uses PHP SESSIONS, modern password-hashing and salting and gives the basic functions a proper login system needs.
+ *
+ * @author Panique
+ * @link https://github.com/panique/php-login-minimal/
+ * @license http://opensource.org/licenses/MIT MIT License
+ */
 
-// Create connection
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
-
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+// checking for minimum PHP version
+if (version_compare(PHP_VERSION, '5.3.7', '<')) {
+    exit("Sorry, Simple PHP Login does not run on a PHP version smaller than 5.3.7 !");
+} else if (version_compare(PHP_VERSION, '5.5.0', '<')) {
+    // if you are using PHP 5.3 or PHP 5.4 you have to include the password_api_compatibility_library.php
+    // (this library adds the PHP 5.5 password hashing functions to older versions of PHP)
+    require_once("libraries/password_compatibility_library.php");
 }
 
-// Set image
-$imageID = isset($_GET['id']) ? $_GET['id'] : 1;
+// include the configs / constants for the database connection
+require_once("../config.php");
 
-// Set loading mode
-$loadMode = isset($_GET['loadMode']) ? $_GET['loadMode'] : 'ORIGINAL';
+// load the login class
+require_once("classes/Login.php");
 
-// Set maximum simultaneous requests
-// REMOVE LATER, ONLY FOR DEBUGGING
-$numRequests = isset($_GET['numRequests']) ? $_GET['numRequests'] : 11;
+// create a login object. when this object is created, it will do all login/logout stuff automatically
+// so this single line handles the entire login process. in consequence, you can simply ...
+$login = new Login();
 
-// Get image information
-$sql = "select * from images where id=$imageID";
-$result = $conn->query($sql);
-$img = mysqli_fetch_assoc($result);
-
-// Get all enabled regions for this image
-$sql = "select * from regions where image_id=$imageID AND disabled=0 order by name asc";
-$result = $conn->query($sql);
-$regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-// Sort regions by target vs OAR
-$regions_TV = [];
-$regions_OAR = [];
-foreach ($regions as $region) {
-  if (preg_match("/(gtv)|(ctv)|(ptv)/i", $region["name"])) {
-    $regions_TV[] = $region;
-  } else {
-    $regions_OAR[] = $region;
-  }
+// ... ask if we are logged in here:
+if ($login->isUserLoggedIn() == true) {
+    // the user is logged in. you can do whatever you want here.
+    // for demonstration purposes, we simply show the "you are logged in" view.
+    // include("views/logged_in.php");
+    header('Location: /atlas.php');
 }
 
-$conn->close();
 ?>
 
-<!DOCTYPE HTML>
-<html>
-<head>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Signin Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-slider.min.css" rel="stylesheet">
-    <link href="css/bootstrap-switch.min.css" rel="stylesheet">
     <link href="css/atlas.css" rel="stylesheet">
-    <title>Rad Onc Atlas</title>
-</head>
 
-<body>
+    <!-- Custom styles for this template -->
+    <link href="css/signin.css" rel="stylesheet">
 
-<div class="container" id="progressContainer">
-  <div class="progress">
-    <div class="progress-bar progress-bar-striped progress-bar-info active" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-      0%
-    </div>
-  </div>
-  <div id="progressText">
-    Loaded:
-  </div>
-</div>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
 
-<div class="container" id="mainContainer">
-    <div class="row" id="description">
-        <p><?= $img["description"] ?></p>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-8">
+  <body id="auth">
 
-            <ul class="nav nav-pills" id="toolbar">
-              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out" data-toggle="tooltip" data-placement="top" title="Zoom Out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
-            </ul>
+    <div class="container">
 
-            <ul class="nav nav-pills" id="doseBtn">
-              <li>
-                <input type="checkbox" name="doseSwitch" id="doseSwitch">
-              </li>
+      <div class="row">
 
-            </ul>
+        <form method="post" action="index.php" name="loginform" class="form-signin">
 
-            <div id="dicomImageWrapper"
-                 class="cornerstone-enabled-image"
-                 oncontextmenu="return false"
-                 unselectable='on'
-                 onselectstart='return false;'
-                 onmousedown='return false;'>
-                
-                <div id="dicomImage" oncontextmenu="return false" tabindex="0">
+          <h2 class="form-signin-heading">Please sign in</h2>
 
+          <label for="login_input_username" class="sr-only">Username</label>
+          <input id="login_input_username" class="login_input form-control" type="text" name="user_name" placeholder="Username" required autofocus/>
 
-                    <div id="imgtopleft">
-                      <div id="imgNameText"><?= $img["name"] ?></div>
-                    </div>
-                    <div id="imgtopright">
-                        <div id="zoomText">Zoom: </div>
-                        <div id="sliceText">Image: </div>
-                    </div>
-                    <div id="imgbottomleft">
-                        <div id="wwwcText">WW/WC: </div>
-                    </div>
-                    <div id="imgmiddleleft">
-                      <div>R</div>
-                    </div>
+          <label for="login_input_password" class="sr-only">Password</label>
+          <input id="login_input_password" class="login_input form-control" type="password" name="user_password" placeholder="Password" autocomplete="off" required />
 
-                    <div id="imgmiddleright">
-                      <div>L</div>
-                    </div>
+          <button class="btn btn-lg btn-primary btn-block" type="submit" name="login" value="Log in">Sign in</button>
 
+        </form>
 
-                </div>
+      </div>
 
-                <div id="doseSliderDiv">
-                  <input type="text" id="doseSlider" />
-                </div>
-            </div>
+      <div class="row">
+        <div class="col-md-4 col-md-offset-4" id="auth-messages">
 
-            <div class="row">
-              <div class="col-md-8">
+        <?php
 
-                <div class="directions">
-                  <p>Use mouse or keyboard arrows up/down to scroll through images.</p>
-                  <p>Scroll over and click labels to highlight contour.</p>
-                </div>
+          if (isset($login)) {
+              if ($login->errors) {
+                  foreach ($login->errors as $error) {
+                      echo $error;
+                  }
+              }
+              if ($login->messages) {
+                  foreach ($login->messages as $message) {
+                      echo $message;
+                  }
+              }
+          }
 
-              </div>
-
-              <div class="col-md-4">
-                <div class="btn-group" role="group" id="ww-presets">
-                  <button type="button" class="btn btn-sm btn-default" id="tissue">Tissue</button>
-                  <button type="button" class="btn btn-sm btn-default" id="lung">Lung</button>
-                  <button type="button" class="btn btn-sm btn-default" id="bone">Bone</button>
-                </div>
-              </div>
-            </div>
-        </div>
-
-        <div class="col-md-4" id="legend">
-          <div class="row">
-
-            <div class="col-md-6" id="OAR-regions">
-
-                <h5>OARs</h5>
-
-                <?php 
-                  foreach($regions_OAR as $region):
-                ?>
-
-                <div class="region" data-id=<?= $region['ROINumber'] ?>>
-
-                  <div class="checkbox">
-                      <input type="checkbox" checked> 
-
-                      <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                      <div class="regionName"><?= $region["name"] ?></div>
-                  </div>
-                  
-                </div>
-
-                <?php endforeach; ?>
-
-
-            </div>
-
-            <div class="col-md-6" id="TV-regions">
-
-                <h5>Target Volumes</h5>
-
-                <?php 
-                  foreach($regions_TV as $region):
-                ?>
-
-                <div class="region" data-id=<?= $region['ROINumber'] ?>>
-
-                  <div class="checkbox">
-                      <input type="checkbox" checked> 
-
-                      <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                      <div class="regionName"><?= $region["name"] ?></div>
-                  </div>
-                  
-                </div>
-
-                <?php endforeach; ?>
-
-
-            </div>
-
-          </div>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-default" id="OAR_on">On</button>
-                <button type="button" class="btn btn-sm btn-default" id="OAR_off">Off</button>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-default" id="TV_on">On</button>
-                <button type="button" class="btn btn-sm btn-default" id="TV_off">Off</button>
-              </div>
-            </div>
-          </div>
-
+        ?>
 
         </div>
+      </div>
+
     </div>
 
-    <div class="row">
-      <div id="doseImage"></div>
-      <canvas id="canvasTemp" width="512" height="512"></canvas>
-    </div>
-</div>
 
-
-
-<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>" data-dosemaximum="<?= $img['doseMaximum'] ?>"></div>
-
-</body>
-
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/bootstrap-slider.min.js"></script>
-<script src="js/bootstrap-switch.min.js"></script>
-<script src="js/cornerstone.min.js"></script>
-<script src="js/cornerstoneMath.min.js"></script>
-<script src="js/cornerstoneTools.min.js"></script>
-<script src="js/dicomParser.min.js"></script>
-<script src="js/jpx.min.js"></script>
-<script src="js/cornerstoneWADOImageLoader.min.js"></script>
-<script src="js/cornerstoneWebImageLoader.min.js"></script>
-<script src="js/sizeof.min.js"></script>
-<script src="js/underscore.min.js"></script>
-<script src="js/bundle.js"></script>
-<script src="js/utility.js"></script>
-<script src="atlas.js"></script>
-
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+  </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

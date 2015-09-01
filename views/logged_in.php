@@ -1,0 +1,1 @@
+<?php echo $_SESSION['user_name']; ?> | <a href="index.php?logout">Sign Out</a>

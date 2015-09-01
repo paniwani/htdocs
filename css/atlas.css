@@ -177,8 +177,23 @@ button {
   display: none;
 }
 
+#logged-in {
+  font-size: 14px;
+  color: white;
+}
 
+#auth-messages {
+  text-align: center;
+  color: red;
+}
 
+.form-signin {
+  color: white;
+}
+
+body#auth {
+  background-color: black;
+}
 
 
 
