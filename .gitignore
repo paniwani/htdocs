@@ -16,3 +16,9 @@ img/*
 .Trashes
 ehthumbs.db
 Thumbs.db
+=======
+img/*
+docs/*
+.DS_Store
+fonts/*
+db/*
