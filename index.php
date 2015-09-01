@@ -52,7 +52,7 @@ if ($login->isUserLoggedIn() == true) {
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Signin Template for Bootstrap</title>
+    <title>eContour</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -120,33 +120,3 @@ if ($login->isUserLoggedIn() == true) {
     <script src="js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> 9a6806831045789eb1ee317fd3531db50ea4cd4c
