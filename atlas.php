@@ -57,10 +57,36 @@ $conn->close();
     <link href="css/bootstrap-slider.min.css" rel="stylesheet">
     <link href="css/bootstrap-switch.min.css" rel="stylesheet">
     <link href="css/atlas.css" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Orbitron:900' rel='stylesheet' type='text/css'>
+
     <title>Rad Onc Atlas</title>
 </head>
 
 <body>
+
+  <!-- Static navbar -->
+  <nav id="mainNavBar" class="navbar navbar-default navbar-static-top">
+    <div class="container">
+      
+      <div class="navbar-header">
+        <div id="logo">eContour</div>
+      </div>
+
+      <div id="navbar" class="navbar-collapse collapse">
+
+        <ul class="nav navbar-nav navbar-right">
+          <div id="logged-in">
+            <?php include("views/logged_in.php"); ?>
+          </div>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+
+
+
 
 <div class="container" id="progressContainer">
   <div class="progress">
@@ -75,12 +101,8 @@ $conn->close();
 
 <div class="container" id="mainContainer">
     <div class="row" id="description">
-        <div class="col-md-10">
+        <div class="col-md-12">
           <p><?= $img["description"] ?></p>
-        </div>
-
-        <div class="col-md-2" id="logged-in">
-          <?php include("views/logged_in.php"); ?>
         </div>
     </div>
     

@@ -184,7 +184,7 @@ button {
 
 #auth-messages {
   text-align: center;
-  color: red;
+  color: white;
 }
 
 .form-signin {
@@ -195,8 +195,21 @@ body#auth {
   background-color: black;
 }
 
+#logo {
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  font-size: 30px;
+}
 
+#mainNavBar {
+  background-color: black;
+  border: none;
+  margin-bottom: 10px;
+}
 
+#mainNavBar .nav > li > a {
+  color: white;
+}
 
 
 

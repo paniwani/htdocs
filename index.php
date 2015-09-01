@@ -61,6 +61,9 @@ if ($login->isUserLoggedIn() == true) {
     <!-- Custom styles for this template -->
     <link href="css/signin.css" rel="stylesheet">
 
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Orbitron:900' rel='stylesheet' type='text/css'>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -76,15 +79,19 @@ if ($login->isUserLoggedIn() == true) {
 
         <form method="post" action="index.php" name="loginform" class="form-signin">
 
-          <h2 class="form-signin-heading">Please sign in</h2>
+          <div id="logo">eContour</div>
 
-          <label for="login_input_username" class="sr-only">Username</label>
-          <input id="login_input_username" class="login_input form-control" type="text" name="user_name" placeholder="Username" required autofocus/>
+          <div class="well well-lg">
 
-          <label for="login_input_password" class="sr-only">Password</label>
-          <input id="login_input_password" class="login_input form-control" type="password" name="user_password" placeholder="Password" autocomplete="off" required />
+            <label for="login_input_username" class="sr-only">Username</label>
+            <input id="login_input_username" class="login_input form-control" type="text" name="user_name" placeholder="Username" required autofocus/>
 
-          <button class="btn btn-lg btn-primary btn-block" type="submit" name="login" value="Log in">Sign in</button>
+            <label for="login_input_password" class="sr-only">Password</label>
+            <input id="login_input_password" class="login_input form-control" type="password" name="user_password" placeholder="Password" autocomplete="off" required />
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit" name="login" value="Log in">Sign in</button>
+
+          </div>
 
         </form>
 
