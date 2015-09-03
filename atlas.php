@@ -59,7 +59,7 @@ $conn->close();
     <link href="css/atlas.css" rel="stylesheet">
     
     <!-- Fonts -->
-    <link href='https://fonts.googleapis.com/css?family=Orbitron:900' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
 
     <title>Rad Onc Atlas</title>
 </head>
