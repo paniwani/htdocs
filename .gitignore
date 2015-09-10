@@ -1,5 +1,6 @@
 docs/*
 img/*
+*.pyc
 
 # Logs and databases #
 ######################
