@@ -46,16 +46,26 @@ class RTPET(object):
     ds = dicom.read_file(file_SRO)
     tfm = ds[0x70,0x308][1][0x0070,0x0309][0][0x0070,0x030a][0][0x3006,0x00c6].value
     tfm = [float(x) for x in tfm]
-    return tfm
+    tfm = array(tfm).reshape(4,4)
+    rotation = tfm[0:3,0:3].ravel().tolist()
+    translation = tfm[0:3,3].ravel().tolist()
+    # translation = [-1*x for x in translation]
 
-
+    return [rotation, translation]
 
   def parse(self):
 
     # Load the PET into simple ITK
     reader = sitk.ImageSeriesReader()
-    reader.SetFileNames(glob.glob(os.path.join(self.PT_dir, "PE*.dcm")))
-    PT_image = reader.Execute()
+
+    # pdb.set_trace()
+
+    # reader.SetFileNames(glob.glob(os.path.join(self.PT_dir, "PE*.dcm")))
+    PT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(PT_dir))
+    # PT_image = reader.Execute()
+
+    print "PT origin: %s" % str(PT_image.GetOrigin())
+    print "PT direction: %s" % str(PT_image.GetDirection())
 
     ## Write original PET image
     # sitk.WriteImage(sitk.Cast(PT_image, sitk.sitkUInt16), [os.path.join("/Users/neil/desktop", "PET_original", "PET_original_{0:03d}.dcm".format(i)) for i in range(PT_image.GetSize()[2])])
@@ -64,9 +74,25 @@ class RTPET(object):
 
 
     # Get transform from dicom SRO
-    tfm_params = self.getTransform()
-    transform = sitk.Transform()
-    transform.SetParameters(tfm_params)
+    rotation, translation = self.getTransform()
+    transform = sitk.AffineTransform(3)
+    transform.SetMatrix(rotation)
+    transform.SetTranslation(translation)
+
+    print "Original transform:"
+    print transform
+
+
+    transform = transform.GetInverse()
+
+    # translation = [0,0,-190]
+    # transform = sitk.TranslationTransform(3, translation)
+
+    # transform = sitk.Transform()
+    # transform.SetParameters(rotation + -1*translation)
+
+    print "Inverted transform:"
+    print transform
 
     
     # Resample PET onto CT
@@ -75,76 +101,98 @@ class RTPET(object):
     # resampleFilter.SetTransform(transform)
     # PT_image = resampleFilter.Execute(PT_image)
 
+    PT_image = sitk.Resample(PT_image, CT_image, transform, sitk.sitkLinear, sitk.sitkFloat32)
+
     
-    # Get min/max
-    minMaxFilter = sitk.MinimumMaximumImageFilter()
-    minMaxFilter.Execute(PT_image)
-    print "Original BQML PET image"
-    print "Min: %s" % minMaxFilter.GetMinimum()
-    print "Max: %s" % minMaxFilter.GetMaximum()
+    # # Get min/max
+    # minMaxFilter = sitk.MinimumMaximumImageFilter()
+    # minMaxFilter.Execute(PT_image)
+    # print "Original BQML PET image"
+    # print "Min: %s" % minMaxFilter.GetMinimum()
+    # print "Max: %s" % minMaxFilter.GetMaximum()
 
 
 
-    PT_image = self.convertBQML2SUV(PT_image)
+    # PT_image = self.convertBQML2SUV(PT_image)
 
 
 
-    minMaxFilter.Execute(PT_image)
-    print "SUV PET image"
-    print "Min: %s" % minMaxFilter.GetMinimum()
-    print "Max: %s" % minMaxFilter.GetMaximum()
+    # minMaxFilter.Execute(PT_image)
+    # print "SUV PET image"
+    # print "Min: %s" % minMaxFilter.GetMinimum()
+    # print "Max: %s" % minMaxFilter.GetMaximum()
 
 
 
-    # SUV bw 0-4
-    PT_image = sitk.IntensityWindowing(PT_image, 0, 4, 0, 255)
-    PT_image = sitk.Cast(PT_image, sitk.sitkUInt8)
+    # # SUV bw 0-4
+    # PT_image = sitk.IntensityWindowing(PT_image, 0, 4, 0, 255)
+    # PT_image = sitk.Cast(PT_image, sitk.sitkUInt8)
 
     self.PT_image = PT_image
 
     ## Write final PET image
-    # sitk.WriteImage(PT_image, os.path.join("/Users/neil/desktop", "PET_final.nii"))
+    sitk.WriteImage(PT_image, os.path.join("/Users/neil/desktop", "PET_final.nii"))
     # sitk.WriteImage(PT_image, [os.path.join("/Users/neil/desktop", "PET_final", "PET_final_{0:03d}.dcm".format(i)) for i in range(PT_image.GetSize()[2])])
 
 
 
     # Plot sample slices
-    CT_array = sitk.GetArrayFromImage(CT_image)
-    PT_array = sitk.GetArrayFromImage(PT_image)
+    # CT_array = sitk.GetArrayFromImage(CT_image)
+    # PT_array = sitk.GetArrayFromImage(PT_image)
 
-    f = pylab.figure()
+    # f = pylab.figure()
 
-    i = 1
-    for n in range(0,3):
-      z = [50, 100, 125][n]
+    # i = 1
+    # for n in range(0,3):
+    #   z = [50, 80, 125][n]
 
-      f.add_subplot(3,2,i)
-      pylab.imshow(CT_array[z,:,:], pylab.cm.Greys_r)
-      i += 1
+    #   f.add_subplot(3,2,i)
+    #   pylab.imshow(CT_array[z,:,:], pylab.cm.Greys_r)
+    #   i += 1
 
-      f.add_subplot(3,2,i)
-      pylab.imshow(PT_array[z,:,:], pylab.cm.afmhot)
-      i += 1
-    pylab.show()
+    #   f.add_subplot(3,2,i)
+    #   pylab.iemshow(PT_array[z,:,:], pylab.cm.rainbow)
+    #   i += 1
+    # pylab.show()
+
+    # z = 100 #125
+
+    # y = 200 #266
+
+    # x = 150 #280
+
+    # f.add_subplot(3,1,1)
+    # pylab.imshow(CT_array[z,:,:], pylab.cm.Greys_r)
+    # pylab.imshow(PT_array[z,:,:], pylab.cm.hot, alpha=0.5)
+
+    # f.add_subplot(3,1,2)
+    # pylab.imshow(CT_array[:,y,:], pylab.cm.Greys_r)
+    # pylab.imshow(PT_array[:,y,:], pylab.cm.hot, alpha=0.5)
+
+    # f.add_subplot(3,1,3)
+    # pylab.imshow(CT_array[:,:,x], pylab.cm.Greys_r)
+    # pylab.imshow(PT_array[:,:,x], pylab.cm.hot, alpha=0.5)
+
+
 
 
     # f.add_subplot(3,2,1)
-    # pylab.imshow(CT_array[CT_size[2]/2,:,:], pylab.cm.Greys_r)
+    # pylab.imshow(CT_array[z,:,:], pylab.cm.Greys_r)
 
     # f.add_subplot(3,2,2)
-    # pylab.imshow(PT_array[PT_size[2]/2,:,:], pylab.cm.Greys_r)
+    # pylab.imshow(PT_array[z,:,:], pylab.cm.rainbow)
 
     # f.add_subplot(3,2,3)
-    # pylab.imshow(CT_array[:,CT_size[1]/2,:], pylab.cm.Greys_r)
+    # pylab.imshow(CT_array[:,y,:], pylab.cm.Greys_r)
 
     # f.add_subplot(3,2,4)
-    # pylab.imshow(PT_array[:,PT_size[1]/2,:], pylab.cm.Greys_r)
+    # pylab.imshow(PT_array[:,y,:], pylab.cm.rainbow)
 
     # f.add_subplot(3,2,5)
-    # pylab.imshow(CT_array[:,:,CT_size[0]/2], pylab.cm.Greys_r)
+    # pylab.imshow(CT_array[:,:,x], pylab.cm.Greys_r)
 
     # f.add_subplot(3,2,6)
-    # pylab.imshow(PT_array[:,:,PT_size[0]/2], pylab.cm.Greys_r)
+    # pylab.imshow(PT_array[:,:,x], pylab.cm.rainbow)
       
     # pylab.show()
     
@@ -164,8 +212,22 @@ CT_dir = "/Users/neil/desktop/dataset/DP_17333717/CT"
 PT_dir = "/Users/neil/desktop/dataset/DP_17333717/PTCT"
 
 reader = sitk.ImageSeriesReader()
-reader.SetFileNames(glob.glob(os.path.join(CT_dir, "CT*.dcm")))
-CT_image = reader.Execute()
+CT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(CT_dir))
+
+# filenames = glob.glob(os.path.join(CT_dir, "CT*.dcm"))
+# numSlices = len(filenames)
+# basename = filenames[0].split(".1.dcm")[0]
+# files = []
+# for i in range(numSlices, 0, -1): # Load images in descending order in order to get correct origin
+#   files.append(basename + "." + str(i) + ".dcm")
+# reader.SetFileNames(files)
+
+# reader.SetFileNames(glob.glob(os.path.join(CT_dir, "CT*.dcm")))
+
+# CT_image = reader.Execute()
+
+print "CT origin: %s" % str(CT_image.GetOrigin())
+print "CT direction: %s" % str(CT_image.GetDirection())
 
 rtPET = RTPET(CT_image, PT_dir)
 
