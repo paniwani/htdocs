@@ -63,7 +63,7 @@ class RTPET(object):
 
     # Load the PET into simple ITK
     reader = sitk.ImageSeriesReader()
-    PT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(PT_dir))
+    PT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(self.PT_dir))
 
     print "PT origin: %s" % str(PT_image.GetOrigin())
     print "PT direction: %s" % str(PT_image.GetDirection())
@@ -82,7 +82,7 @@ class RTPET(object):
 
     
     # Resample PET onto CT with linear interpolation and using transform
-    PT_image = sitk.Resample(PT_image, CT_image, transform, sitk.sitkLinear, sitk.sitkFloat32)
+    PT_image = sitk.Resample(PT_image, self.CT_image, transform, sitk.sitkLinear, sitk.sitkFloat32)
 
     # Convert PET units from BQML to SUV bw
     PT_image = self.convertBQML2SUVbw(PT_image)
@@ -126,14 +126,6 @@ class RTPET(object):
     # pylab.imshow(PT_array[:,:,x], pylab.cm.hot, alpha=0.5)
       
     # pylab.show()
-
-CT_dir = "/Users/neil/desktop/dataset/DP_17333717/CT"
-PT_dir = "/Users/neil/desktop/dataset/DP_17333717/PTCT"
-
-reader = sitk.ImageSeriesReader()
-CT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(CT_dir))
-
-rtPET = RTPET(CT_image, PT_dir)
 
 
 

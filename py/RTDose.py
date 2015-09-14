@@ -8,17 +8,15 @@ import json
 from numpy import *
 
 class RTDose(object):
-  def __init__(self, directory):
-    self.directory = directory
+  def __init__(self, CT_image, dose_file):
+    self.CT_image = CT_image
+    self.dose_file = dose_file
     self.parse()
 
   def parse(self):
 
-    cwd = os.getcwd()
-
     # Get dose pixel data as numpy array
-    doseFile = glob.glob(self.directory + "/RD*.dcm")[0]
-    ds = dicom.read_file(doseFile)
+    ds = dicom.read_file(self.dose_file)
 
     data = fromstring(ds.PixelData, dtype=uint32)
     data = data.reshape((ds.NumberofFrames, ds.Rows, ds.Columns))
@@ -51,50 +49,35 @@ class RTDose(object):
     # print "Dose origin: " + str(doseImage.GetOrigin())
     # print "Dose direction: " + str(doseImage.GetDirection())
 
-    # Setup patient image in itk
-    os.chdir(self.directory)
-    reader = sitk.ImageSeriesReader()
-    filenames = sorted(glob.glob("CT*.dcm"))
-    numSlices = len(filenames)
-    basename = filenames[0].split(".1.dcm")[0]
-    files = []
-    for i in range(numSlices, 0, -1): # Load images in descending order in order to get correct origin
-      files.append(basename + "." + str(i) + ".dcm")
-
-    reader.SetFileNames(files)
-    image = reader.Execute()
-
-    # print "Image origin: " + str(image.GetOrigin()) 
-    # print "Image direction: " + str(image.GetDirection())
+    # print "Image origin: " + str(CT_image.GetOrigin()) 
+    # print "Image direction: " + str(CT_image.GetDirection())
 
     # Resample dose image onto patient image
     resampleFilter = sitk.ResampleImageFilter()
-    resampleFilter.SetReferenceImage(image)
+    resampleFilter.SetReferenceImage(self.CT_image)
     doseImage = resampleFilter.Execute(doseImage)
-    doseArray = sitk.GetArrayFromImage(doseImage)
 
-    # Filter dose image with a color map
+    # Convert dose values to RGB colormap
     # doseImage = sitk.ScalarToRGBColormap(doseImage, sitk.ScalarToRGBColormapImageFilter.Jet)
 
-    self.array = doseArray
     self.image = doseImage
 
-    os.chdir(cwd)
+    # Plot sample slices
+    # imageArray = sitk.GetArrayFromImage(self.CT_image)
+    # doseArray  = sitk.GetArrayFromImage(doseImage)
 
-    # # Plot sample slices
-    # imageArray = sitk.GetArrayFromImage(image)
     # f = pylab.figure()
 
     # i = 1
     # for n in range(0,3):
-    #   z = [50, 125, 200][n]
+    #   z = [25, 75, 125][n]
 
     #   f.add_subplot(3,2,i)
     #   pylab.imshow(imageArray[z,:,:], pylab.cm.Greys_r)
     #   i += 1
 
     #   f.add_subplot(3,2,i)
-    #   pylab.imshow(doseArray[z,:,:])
+    #   pylab.imshow(doseArray[z,:,:], pylab.cm.jet)
     #   i += 1
     # pylab.show()
 
