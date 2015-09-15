@@ -120,7 +120,7 @@ if os.path.isdir(PT_dir):
   rtPET = RTPET(CT_image, PT_dir)
   out_PT_dir = os.path.join(dsDir, "PT")
   os.makedirs(out_PT_dir)
-  sitk.WriteImage(rtPET.PT_image, [os.path.join(out_PT_dir, "PT.{0}.jpg".format(i)) for i in range(1,numSlices+1)], True)
+  sitk.WriteImage(rtPET.PT_image, [os.path.join(out_PT_dir, "PT.{0}.jpg".format(i)) for i in range(rtPET.PT_image.GetSize()[2], 0, -1)], True)
   cur.execute("UPDATE images SET PET_SUVbw_scale_factor=%s WHERE id=%s", (rtPET.SUVbw_scale_factor, imageID)) 
 
 # Close database

@@ -1,6 +1,7 @@
 var element, doseElement;
 var stack = {};
 var doseStack = {};
+var petStack = {};
 var loadProgress = {};
 
 $(function() {
@@ -15,8 +16,13 @@ $(function() {
     var doseOn = false;
     var doseThreshold = 2;
 
+    var petImageIds = [];
+    var petOn = false;
+
+    // Setup cornerstone elements
     element = $('#dicomImage').get(0);
     doseElement = $('#doseImage').get(0);
+    petElement = $('#petImage').get(0);
 
     // Get image information from DOM
     imgdata = $('#image-data').data();
@@ -44,6 +50,11 @@ $(function() {
         doseImageIds.push(location.origin + "/img/" + imgdata.name + "/Dose/" + "dose." + i + ".jpg");
     }
 
+    for (var i=1; i < imgdata.numslices + 1; i++) {
+        petImageIds.push(location.origin + "/img/" + imgdata.name + "/PT/" + "PT." + i + ".jpg");
+    }
+
+
     stack = {
         currentImageIdIndex : 0,
         imageIds: imageIds
@@ -54,18 +65,38 @@ $(function() {
         imageIds: doseImageIds
     };
 
-    // Setup color map
+    petStack = {
+        currentImageIdIndex: 0,
+        imageIds: petImageIds
+    }
+
+    // Setup color maps
     var cm = require('colormap');
-    var colormap = cm( { colormap: "jet", nshades: 256, format: "rgba", alpha: 0.5 } );
-    colormap.splice(-1, 1); colormap.splice(0, 1);
+    var dose_colormap = cm( { colormap: "jet", nshades: 256, format: "rgba", alpha: 0.5 } );
+    dose_colormap.splice(-1, 1); dose_colormap.splice(0, 1);
+
+    var pet_colormap = cm( { colormap: "hot", nshades: 256, format: "rgba", alpha: 0.5 } );
+    pet_colormap.splice(-1, 1); pet_colormap.splice(0, 1);
+
 
     // Setup stack progress loader
+    // Load all images first
+
+    all_imageIds = stack.imageIds.concat(doseStack.imageIds).concat(petStack.imageIds).slice(0)
+
     loadProgress = {
-        "imageIds": stack.imageIds.slice(0),
-        "total": stack.imageIds.length,
-        "remaining": stack.imageIds.length,
-        "percentLoaded": 0,
-    };
+        "imageIds": all_imageIds,
+        "total": all_imageIds.length,
+        "remaining": all_imageIds.length,
+        "percentLoaded": 0
+    }
+
+    // loadProgress = {
+    //     "imageIds": stack.imageIds.slice(0),
+    //     "total": stack.imageIds.length,
+    //     "remaining": stack.imageIds.length,
+    //     "percentLoaded": 0,
+    // };
 
     console.time("Stack Loading");
     $(cornerstone).on("CornerstoneImageLoaded", onImageProgressLoaded); // Image loading events are bound to the cornerstone object, not the element
@@ -98,7 +129,8 @@ $(function() {
             ctx = detail.canvasContext;
             cornerstone.setToPixelCoordinateSystem(detail.enabledElement, ctx);  
 
-            if (doseOn) { drawDose(ctx, colormap, doseThreshold, imgdata.dosemaximum); }
+            if (doseOn) { drawDose(ctx, dose_colormap, doseThreshold, imgdata.dosemaximum); }
+            if (petOn)  { drawPET(ctx, pet_colormap); }
             drawContours(ctx, stackContours[stack.currentImageIdIndex], ignoreRegions, highlightedRegions, hoverRegion) 
         });
 
@@ -135,6 +167,8 @@ $(function() {
             cornerstoneTools.wwwc.activate(element, 1);
         });
 
+        // Dose
+
         $("#doseSwitch").bootstrapSwitch({
             size: "small",
             labelText: "Dose"
@@ -168,6 +202,18 @@ $(function() {
             tooltip: "hide"
         }).on("slideStop", function(data) {
             doseThreshold = data.value;
+            cornerstone.updateImage(element);
+        });
+
+        // PET
+
+        $("#petSwitch").bootstrapSwitch({
+            size: "small",
+            labelText: "PET"
+        });
+
+        $("#petSwitch").on('switchChange.bootstrapSwitch', function(event, state) {
+            petOn = !petOn;
             cornerstone.updateImage(element);
         });
 
@@ -329,6 +375,7 @@ function setupImage() {
     // Enable the dicomImage element
     cornerstone.enable(element);
     cornerstone.enable(doseElement);
+    cornerstone.enable(petElement);
 
     var synchronizer = new cornerstoneTools.Synchronizer("CornerstoneNewImage", cornerstoneTools.stackImageIndexSynchronizer);
 
@@ -373,25 +420,23 @@ function setupImage() {
     });
 
     cornerstone.loadImage(doseStack.imageIds[0]).then(function(doseImage) {
-        // cornerstone.displayImage(doseElement, doseImage);
-
-        // Enable mouse and keyboard inputs
-        cornerstoneTools.keyboardInput.enable(doseElement);
-        cornerstoneTools.mouseInput.enable(doseElement);
-        cornerstoneTools.mouseWheelInput.enable(doseElement);
-
         // Set the stack as tool state
         cornerstoneTools.addStackStateManager(doseElement, ['stack']);
         cornerstoneTools.addToolState(doseElement, 'stack', doseStack);
 
-        cornerstoneTools.stackScrollKeyboard.activate(doseElement);
-        cornerstoneTools.stackScrollWheel.activate(doseElement);
-
         cornerstoneTools.stackPrefetch.enable(doseElement, 3);
 
         synchronizer.add(doseElement);
+    });
 
+    cornerstone.loadImage(petStack.imageIds[0]).then(function(petImage) {
+        // Set the stack as tool state
+        cornerstoneTools.addStackStateManager(petElement, ['stack']);
+        cornerstoneTools.addToolState(petElement, 'stack', petStack);
 
+        cornerstoneTools.stackPrefetch.enable(petElement, 3);
+
+        synchronizer.add(petElement);
     });
 
     

@@ -80,6 +80,37 @@ function drawDose(ctx, colormap, threshold, max) {
     ctx.drawImage(canvasTemp, 0, 0);
 }
 
+function drawPET(ctx, colormap) {
+    var petImageObject = cornerstone.getImage(petElement);
+    if (petImageObject === undefined) return;
+    var canvasPet = petImageObject.getCanvas();
+    var ctxPet = canvasPet.getContext("2d");
+
+    var d = ctxPet.getImageData(0, 0, canvasPet.width, canvasPet.height);
+
+    max = 255;
+    min = 0;
+
+    for (var i = 0; i < d.data.length; i += 4) {
+
+        var f = parseFloat(d.data[i] - min) / (max - min);
+        if (f < 0) { f = 0; }
+        f = Math.round(f * (colormap.length-1));
+        
+        d.data[i]     = colormap[f][0]
+        d.data[i+1]   = colormap[f][1]
+        d.data[i+2]   = colormap[f][2]
+        d.data[i+3]   = 150; // alpha on scale 0-255
+    }
+
+    var canvasTemp = $("#canvasTemp").get(0);
+    var ctxTemp = canvasTemp.getContext("2d");
+    ctxTemp.putImageData(d, 0, 0);
+
+    ctx.drawImage(canvasTemp, 0, 0);
+
+}
+
 
 
 

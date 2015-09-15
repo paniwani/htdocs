@@ -116,9 +116,13 @@ $conn->close();
               <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
             </ul>
 
-            <ul class="nav nav-pills" id="doseBtn">
+            <ul class="nav nav-pills" id="overlayBtns">
               <li>
                 <input type="checkbox" name="doseSwitch" id="doseSwitch">
+              </li>
+
+              <li>
+                <input type="checkbox" name="petSwitch" id="petSwitch">
               </li>
 
             </ul>
@@ -254,6 +258,7 @@ $conn->close();
 
     <div class="row">
       <div id="doseImage"></div>
+      <div id="petImage"></div>
       <canvas id="canvasTemp" width="512" height="512"></canvas>
     </div>
 </div>
