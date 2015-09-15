@@ -125,6 +125,10 @@ $conn->close();
                 <input type="checkbox" name="petSwitch" id="petSwitch">
               </li>
 
+              <li>
+                <input type="checkbox" name="mrSwitch" id="mrSwitch">
+              </li>
+
             </ul>
 
             <div id="dicomImageWrapper"
@@ -259,6 +263,7 @@ $conn->close();
     <div class="row">
       <div id="doseImage"></div>
       <div id="petImage"></div>
+      <div id="mrImage"></div>
       <canvas id="canvasTemp" width="512" height="512"></canvas>
     </div>
 </div>

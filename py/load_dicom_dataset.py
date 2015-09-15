@@ -40,6 +40,7 @@ filenames = glob.glob(os.path.join(CT_dir, "CT*.dcm"))
 numSlices = len(filenames)
 image1 = sorted(filenames)[0]
 imageBaseName = image1.split(CT_dir)[1].split(".1.dcm")[0].split("/")[1]
+filenames = [os.path.join(CT_dir, (imageBaseName + "." + str(i) + ".dcm")) for i in range(1,numSlices+1)]
 
 rtStructFile = glob.glob(os.path.join(dataset_dir, "RS*.dcm"))[0]
 rtDoseFile   = glob.glob(os.path.join(dataset_dir, "RD*.dcm"))[0]
@@ -85,10 +86,12 @@ dsDir = os.path.join(outDir, dataset)
 os.makedirs(dsDir)
 os.makedirs(dsDir + "/CT_jpg")
 
-for im in filenames:
-  imName = im.split(".dcm")[0]
-  os.system("dcmj2pnm +oj +Jq 90 +Ww 20 400 %s %s" % (im, imName + ".jpg"))
-  shutil.move(imName + ".jpg", dsDir + "/CT_jpg")
+for i in range(1, numSlices+1):
+  im = filenames[i-1]
+  imName = "CT.{0}.jpg".format(i)
+
+  os.system("dcmj2pnm +oj +Jq 90 +Ww 20 400 %s %s" % (im, imName))
+  shutil.move(imName, dsDir + "/CT_jpg")
 
 print "Converted dicom to jpeg"
 

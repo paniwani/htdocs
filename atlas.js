@@ -1,7 +1,8 @@
-var element, doseElement;
+var element, doseElement, petElement, mrElement;
 var stack = {};
 var doseStack = {};
 var petStack = {};
+var mrStack = {};
 var loadProgress = {};
 
 $(function() {
@@ -19,10 +20,14 @@ $(function() {
     var petImageIds = [];
     var petOn = false;
 
+    var mrImageIds = [];
+    var mrOn = false;
+
     // Setup cornerstone elements
     element = $('#dicomImage').get(0);
     doseElement = $('#doseImage').get(0);
     petElement = $('#petImage').get(0);
+    mrElement = $('#mrImage').get(0);
 
     // Get image information from DOM
     imgdata = $('#image-data').data();
@@ -41,19 +46,18 @@ $(function() {
                 break;
             default:
                 dir = "CT_jpg";
-                imageIds.push(location.origin + "/img/" + imgdata.name + "/" + dir + "/" + imgdata.basename + "." + i + ".jpg");
+                imageIds.push(location.origin + "/img/" + imgdata.name + "/" + dir + "/CT." + i + ".jpg");
                 break;
         }
     };
 
     for (var i=1; i < imgdata.numslices + 1; i++) {
         doseImageIds.push(location.origin + "/img/" + imgdata.name + "/Dose/" + "dose." + i + ".jpg");
-    }
 
-    for (var i=1; i < imgdata.numslices + 1; i++) {
         petImageIds.push(location.origin + "/img/" + imgdata.name + "/PT/" + "PT." + i + ".jpg");
-    }
 
+        mrImageIds.push(location.origin + "/img/" + imgdata.name + "/MR/" + "MR." + i + ".jpg");
+    }
 
     stack = {
         currentImageIdIndex : 0,
@@ -70,6 +74,11 @@ $(function() {
         imageIds: petImageIds
     }
 
+    mrStack = {
+        currentImageIdIndex: 0,
+        imageIds: mrImageIds
+    }
+
     // Setup color maps
     var cm = require('colormap');
     var dose_colormap = cm( { colormap: "jet", nshades: 256, format: "rgba", alpha: 0.5 } );
@@ -80,9 +89,9 @@ $(function() {
 
 
     // Setup stack progress loader
-    // Load all images first
 
-    all_imageIds = stack.imageIds.concat(doseStack.imageIds).concat(petStack.imageIds).slice(0)
+    // Load all images upfront
+    all_imageIds = stack.imageIds.concat(doseStack.imageIds).concat(petStack.imageIds).concat(mrStack.imageIds).slice(0)
 
     loadProgress = {
         "imageIds": all_imageIds,
@@ -91,15 +100,8 @@ $(function() {
         "percentLoaded": 0
     }
 
-    // loadProgress = {
-    //     "imageIds": stack.imageIds.slice(0),
-    //     "total": stack.imageIds.length,
-    //     "remaining": stack.imageIds.length,
-    //     "percentLoaded": 0,
-    // };
-
     console.time("Stack Loading");
-    $(cornerstone).on("CornerstoneImageLoaded", onImageProgressLoaded); // Image loading events are bound to the cornerstone object, not the element
+    $(cornerstone).on("CornerstoneImageLoaded", onImageProgressLoaded);
 
     // Get stack contours from server and organize them by z
     for (var i=0; i < imgdata.numslices; i++) {
@@ -131,6 +133,7 @@ $(function() {
 
             if (doseOn) { drawDose(ctx, dose_colormap, doseThreshold, imgdata.dosemaximum); }
             if (petOn)  { drawPET(ctx, pet_colormap); }
+            if (mrOn)   { drawMRI(ctx); }
             drawContours(ctx, stackContours[stack.currentImageIdIndex], ignoreRegions, highlightedRegions, hoverRegion) 
         });
 
@@ -216,6 +219,18 @@ $(function() {
             petOn = !petOn;
             cornerstone.updateImage(element);
         });
+
+        // MR
+         $("#mrSwitch").bootstrapSwitch({
+            size: "small",
+            labelText: "MRI"
+        });
+
+        $("#mrSwitch").on('switchChange.bootstrapSwitch', function(event, state) {
+            mrOn = !mrOn;
+            cornerstone.updateImage(element);
+        });
+
 
         // Tooltips
         $(function(){
@@ -376,6 +391,7 @@ function setupImage() {
     cornerstone.enable(element);
     cornerstone.enable(doseElement);
     cornerstone.enable(petElement);
+    cornerstone.enable(mrElement);
 
     var synchronizer = new cornerstoneTools.Synchronizer("CornerstoneNewImage", cornerstoneTools.stackImageIndexSynchronizer);
 
@@ -437,6 +453,16 @@ function setupImage() {
         cornerstoneTools.stackPrefetch.enable(petElement, 3);
 
         synchronizer.add(petElement);
+    });
+
+    cornerstone.loadImage(mrStack.imageIds[0]).then(function(mrImage) {
+        // Set the stack as tool state
+        cornerstoneTools.addStackStateManager(mrElement, ['stack']);
+        cornerstoneTools.addToolState(mrElement, 'stack', mrStack);
+
+        cornerstoneTools.stackPrefetch.enable(mrElement, 3);
+
+        synchronizer.add(mrElement);
     });
 
     

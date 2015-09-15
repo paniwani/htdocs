@@ -111,6 +111,25 @@ function drawPET(ctx, colormap) {
 
 }
 
+function drawMRI(ctx) {
+    var mrImageObject = cornerstone.getImage(mrElement);
+    if (mrImageObject === undefined) return;
+    var mrCanvas = mrImageObject.getCanvas();
+    var mrCtx = mrCanvas.getContext("2d");
+
+    var d = mrCtx.getImageData(0, 0, mrCanvas.width, mrCanvas.height);
+
+    for (var i = 0; i < d.data.length; i += 4) {
+        d.data[i+3]   = 220; // alpha on scale 0-255
+    }
+
+    var canvasTemp = $("#canvasTemp").get(0);
+    var ctxTemp = canvasTemp.getContext("2d");
+    ctxTemp.putImageData(d, 0, 0);
+
+    ctx.drawImage(canvasTemp, 0, 0);
+}
+
 
 
 
