@@ -77,8 +77,8 @@ class RTPET(object):
     # Use inverse of the transform. Not entirely sure why but the registration works perfectly when inversed.
     transform = transform.GetInverse()
 
-    print "Inverted transform:"
-    print transform
+    # print "Inverted transform:"
+    # print transform
 
     
     # Resample PET onto CT with linear interpolation and using transform

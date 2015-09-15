@@ -11,6 +11,7 @@ import SimpleITK as sitk
 from RTStruct import RTStruct
 from RTDose import RTDose
 from RTPET import RTPET
+from RTMR import RTMR
 
 def usage():
   print "usage: python load_dicom_dataset.py input_directory output_directory"
@@ -31,6 +32,7 @@ dataset = "DP_17333717" # TODO: Only load DP for now
 dataset_dir = os.path.join(inDir, dataset)
 CT_dir = os.path.join(dataset_dir, "CT")
 PT_dir = os.path.join(dataset_dir, "PTCT")
+MR_dir = os.path.join(dataset_dir, "MR_T1")
 
 # Get image file names
 
@@ -122,6 +124,15 @@ if os.path.isdir(PT_dir):
   os.makedirs(out_PT_dir)
   sitk.WriteImage(rtPET.PT_image, [os.path.join(out_PT_dir, "PT.{0}.jpg".format(i)) for i in range(rtPET.PT_image.GetSize()[2], 0, -1)], True)
   cur.execute("UPDATE images SET PET_SUVbw_scale_factor=%s WHERE id=%s", (rtPET.SUVbw_scale_factor, imageID)) 
+  print "Saved PET"
+
+# Get and save PET if it exists
+if os.path.isdir(MR_dir):
+  rtMR = RTMR(CT_image, MR_dir)
+  out_MR_dir = os.path.join(dsDir, "MR")
+  os.makedirs(out_MR_dir)
+  sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
+  print "Saved MRI"
 
 # Close database
 db.commit()
