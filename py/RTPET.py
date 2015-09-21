@@ -14,7 +14,7 @@ class RTPET(object):
 
   # Convert PET pixel data from BQML units to SUV bw
   # Using pseudocode from QIBA working group: awiki.rsna.org/index.php?title=Standardized_Uptake_Value_(SUV)
-  # Returns scaled PET image
+  # Returns PET image in SUVbw units
   def convertBQML2SUVbw(self, PT_BQML_image):
 
     # Get metadata from PET
@@ -30,18 +30,18 @@ class RTPET(object):
     
     injected_dose = float(ds[0x0054,0x0016][0][0x0018,0x1074].value) # in BQ
 
-    # print "Half life: %s" % half_life
-    # print "Scan time: %s" % scan_time
-    # print "Start time: %s" % start_time
-    # print "Decay time: %s" % decay_time
-    # print "Injected dose: %s" % injected_dose
+    print "Weight: %s" % weight 
+    print "Half life: %s" % half_life
+    print "Scan time: %s" % scan_time
+    print "Start time: %s" % start_time
+    print "Decay time: %s" % decay_time
+    print "Injected dose: %s" % injected_dose
 
     decayed_dose = injected_dose * math.pow(2, -decay_time / half_life)
-    SUVbw_scale_factor = weight * 100 / decayed_dose
+    SUVbw_scale_factor = weight * 1000 / decayed_dose
 
-    # print "Decayed dose: %s" % decayed_dose
-
-    print "SUV bw scale factor: %s" % SUVbw_scale_factor
+    print "Decayed dose: %s" % decayed_dose
+    print "SUV bw scale factor: %s\n" % SUVbw_scale_factor
 
     return PT_BQML_image * SUVbw_scale_factor
 
@@ -59,6 +59,14 @@ class RTPET(object):
 
     return [rotation, translation]
 
+  def printMax(self, image, caption):
+    minMaxFilter = sitk.MinimumMaximumImageFilter()
+    minMaxFilter.Execute(image)
+    maximum = minMaxFilter.GetMaximum()
+    print "\n" + caption
+    print "Max: %s\n" % maximum
+    return maximum
+
   def parse(self):
 
     # Load the PET into simple ITK
@@ -68,7 +76,9 @@ class RTPET(object):
     print "PT origin: %s" % str(PT_image.GetOrigin())
     print "PT direction: %s" % str(PT_image.GetDirection())
 
-    # Get transform from dicom SRO
+    self.printMax(PT_image, "Original PET Image - BQML")
+
+    # Get transform from dicom spatial registration object
     rotation, translation = self.getTransform()
     transform = sitk.AffineTransform(3)
     transform.SetMatrix(rotation)
@@ -77,27 +87,22 @@ class RTPET(object):
     # Use inverse of the transform. Not entirely sure why but the registration works perfectly when inversed.
     transform = transform.GetInverse()
 
-    # print "Inverted transform:"
-    # print transform
-
-    
     # Resample PET onto CT with linear interpolation and using transform
-    PT_image = sitk.Resample(PT_image, self.CT_image, transform, sitk.sitkLinear, sitk.sitkFloat32)
+    PT_image = sitk.Resample(PT_image, self.CT_image, transform)
+
+    self.printMax(PT_image, "Resampled PET Image - BQML")
 
     # Convert PET units from BQML to SUV bw
-    PT_image = self.convertBQML2SUVbw(PT_image)
-
-    # Get min/max of PET
-    minMaxFilter = sitk.MinimumMaximumImageFilter()
-    minMaxFilter.Execute(PT_image)
-    maximum = minMaxFilter.GetMaximum()
-    print "SUVbw PET image"
-    print "Max: %s" % maximum
+    # PT_image = self.convertBQML2SUVbw(PT_image)
+    # SUV_max = self.printMax(PT_image, "Resampled PET Image - SUVbw")
 
     # Rescale and cast to unsigned 8 bit
-    PT_image = sitk.Cast(sitk.RescaleIntensity(PT_image, 0, 255), sitk.sitkUInt8)
+    PT_image = sitk.Cast(sitk.RescaleIntensity(PT_image), sitk.sitkUInt8)
 
-    self.SUVbw_scale_factor = float(maximum / 255)
+    # Threshold to SUVbw 0-4 for highlighting
+    # PT_image = sitk.Cast(sitk.IntensityWindowing(PT_image, 0, 10, 0, 255), sitk.sitkUInt8)
+
+    self.SUVbw_scale_factor = 0 # float(SUV_max / 255)
     self.PT_image = PT_image
 
     # Write final PET image for debugging

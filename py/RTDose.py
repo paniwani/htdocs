@@ -44,7 +44,7 @@ class RTDose(object):
     maximum = minMaxFilter.GetMaximum()
     self.maximum = maximum
 
-    print "Dose maximum: " + str(maximum)
+    print "Dose maximum: %s" % maximum
 
     # print "Dose origin: " + str(doseImage.GetOrigin())
     # print "Dose direction: " + str(doseImage.GetDirection())
@@ -56,6 +56,13 @@ class RTDose(object):
     resampleFilter = sitk.ResampleImageFilter()
     resampleFilter.SetReferenceImage(self.CT_image)
     doseImage = resampleFilter.Execute(doseImage)
+
+    minMaxFilter = sitk.MinimumMaximumImageFilter()
+    minMaxFilter.Execute(doseImage)
+    minimum = minMaxFilter.GetMinimum()
+    maximum = minMaxFilter.GetMaximum()
+
+    print "\nResampled Dose maximum: %s" % maximum
 
     # Convert dose values to RGB colormap
     # doseImage = sitk.ScalarToRGBColormap(doseImage, sitk.ScalarToRGBColormapImageFilter.Jet)
