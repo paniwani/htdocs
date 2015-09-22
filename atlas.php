@@ -267,7 +267,7 @@ $conn->close();
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="overlayImages">
       <div id="doseImage"></div>
       <div id="petImage"></div>
       <div id="mr1Image"></div>

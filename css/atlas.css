@@ -40,6 +40,10 @@ body {
   display: none;
 }
 
+#overlayImages {
+  display: none;
+}
+
 #canvasTemp {
   display: none;
 }
