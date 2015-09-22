@@ -177,6 +177,27 @@ button {
   display: none;
 }
 
+#alphaSliderDiv {
+  visibility: hidden;
+
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+#alphaSlider {
+  width: 75px;
+  height: 20px;
+}
+
+#alphaSlider .slider-tick {
+  display: none;
+}
+
+#alphaText {
+  text-align: center;
+}
+
 #logged-in {
   font-size: 14px;
   color: white;
@@ -209,6 +230,10 @@ body#auth {
 
 #mainNavBar .nav > li > a {
   color: white;
+}
+
+#overlaySelect {
+  margin-right: 20px;
 }
 
 

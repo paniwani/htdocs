@@ -1,9 +1,13 @@
-var element, doseElement, petElement, mrElement;
+var element, doseElement, petElement, mr1Element, mr2Element;
 var stack = {};
 var doseStack = {};
 var petStack = {};
-var mrStack = {};
+var mr1Stack = {};
+var mr2Stack = {};
 var loadProgress = {};
+var overlays;
+var overlayMode = "NONE";
+var overlayAlpha = 0.5;
 
 $(function() {
     var imgdata = {};
@@ -12,25 +16,25 @@ $(function() {
     var hoverRegion = 0;
     var stackContours = [];
     var imageIds = [];
-
-    var doseImageIds = [];
-    var doseOn = false;
     var doseThreshold = 2;
 
+    var doseImageIds = [];
     var petImageIds = [];
-    var petOn = false;
-
-    var mrImageIds = [];
-    var mrOn = false;
+    var mr1ImageIds = [];
+    var mr2ImageIds = [];
 
     // Setup cornerstone elements
     element = $('#dicomImage').get(0);
     doseElement = $('#doseImage').get(0);
     petElement = $('#petImage').get(0);
-    mrElement = $('#mrImage').get(0);
+    mr1Element = $('#mr1Image').get(0);
+    mr2Element = $('#mr2Image').get(0);
 
     // Get image information from DOM
     imgdata = $('#image-data').data();
+
+    // Get overlays
+    overlays = imgdata.overlays.split(",");
 
     // Set up stack of images to load
     for (var i=1; i < imgdata.numslices + 1; i++) {
@@ -56,7 +60,9 @@ $(function() {
 
         petImageIds.push(location.origin + "/img/" + imgdata.name + "/PT/" + "PT." + i + ".jpg");
 
-        mrImageIds.push(location.origin + "/img/" + imgdata.name + "/MR/" + "MR." + i + ".jpg");
+        mr1ImageIds.push(location.origin + "/img/" + imgdata.name + "/MR1/" + "MR1." + i + ".jpg");
+
+        mr2ImageIds.push(location.origin + "/img/" + imgdata.name + "/MR2/" + "MR2." + i + ".jpg");
     }
 
     stack = {
@@ -74,9 +80,14 @@ $(function() {
         imageIds: petImageIds
     }
 
-    mrStack = {
+    mr1Stack = {
         currentImageIdIndex: 0,
-        imageIds: mrImageIds
+        imageIds: mr1ImageIds
+    }
+
+    mr2Stack = {
+        currentImageIdIndex: 0,
+        imageIds: mr2ImageIds
     }
 
     // Setup color maps
@@ -87,11 +98,19 @@ $(function() {
     var pet_colormap = cm( { colormap: "hot", nshades: 256, format: "rgba", alpha: 0.5 } );
     pet_colormap.splice(-1, 1); pet_colormap.splice(0, 1);
 
-
     // Setup stack progress loader
 
     // Load all images upfront
-    all_imageIds = stack.imageIds.concat(doseStack.imageIds).concat(petStack.imageIds).concat(mrStack.imageIds).slice(0)
+    var all_imageIds = [];
+    all_imageIds.push(stack.imageIds.slice(0));
+    all_imageIds.push(doseStack.imageIds.slice(0));
+
+    // Only load overlays if they exist
+    if (_.contains(overlays, "PT"))  { all_imageIds.push(petStack.imageIds.slice(0)); }
+    if (_.contains(overlays, "MR1")) { all_imageIds.push(mr1Stack.imageIds.slice(0)); }
+    if (_.contains(overlays, "MR2")) { all_imageIds.push(mr2Stack.imageIds.slice(0)); }
+
+    all_imageIds = [].concat.apply([], all_imageIds);
 
     loadProgress = {
         "imageIds": all_imageIds,
@@ -131,9 +150,10 @@ $(function() {
             ctx = detail.canvasContext;
             cornerstone.setToPixelCoordinateSystem(detail.enabledElement, ctx);  
 
-            if (doseOn) { drawDose(ctx, dose_colormap, doseThreshold, imgdata.dosemaximum); }
-            if (petOn)  { drawPET(ctx, pet_colormap); }
-            if (mrOn)   { drawMRI(ctx); }
+            if (overlayMode == "DOSE") { drawDose(ctx, dose_colormap, doseThreshold, imgdata.dosemaximum); }
+            if (overlayMode == "PT")  { drawPET(ctx, pet_colormap); }
+            if (overlayMode == "MR1") { drawMRI(ctx, mr1Element); }
+            if (overlayMode == "MR2") { drawMRI(ctx, mr2Element); }
             drawContours(ctx, stackContours[stack.currentImageIdIndex], ignoreRegions, highlightedRegions, hoverRegion) 
         });
 
@@ -170,19 +190,6 @@ $(function() {
             cornerstoneTools.wwwc.activate(element, 1);
         });
 
-        // Dose
-
-        $("#doseSwitch").bootstrapSwitch({
-            size: "small",
-            labelText: "Dose"
-        });
-
-        $("#doseSwitch").on('switchChange.bootstrapSwitch', function(event, state) {
-            doseOn = !doseOn;
-            $("#doseSliderDiv").visibilityToggle();
-            cornerstone.updateImage(element);
-        });
-
         var doseMax = imgdata.dosemaximum;
         var ticks = _.range(0, doseMax, 10);
         if ( (doseMax % 10) !== 0 ) { ticks.push(doseMax) }
@@ -201,36 +208,47 @@ $(function() {
             reversed: true,
             ticks: ticks,
             ticks_labels: ticksStrings,
-            value: doseThreshold,
+            value: 2, // threshold dose at 2 Gy
             tooltip: "hide"
         }).on("slideStop", function(data) {
             doseThreshold = data.value;
             cornerstone.updateImage(element);
         });
 
-        // PET
-
-        $("#petSwitch").bootstrapSwitch({
-            size: "small",
-            labelText: "PET"
-        });
-
-        $("#petSwitch").on('switchChange.bootstrapSwitch', function(event, state) {
-            petOn = !petOn;
+        // Alpha slider
+        $("#alphaSlider").slider({
+            id: "alphaSlider",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            value: overlayAlpha,
+            ticks: [0, 1],
+            ticks_labels: [0, 1],
+            ticks_snap_bounds: 0
+        }).on("slide", function(data) {
+            overlayAlpha = data.value;
             cornerstone.updateImage(element);
         });
 
-        // MR
-         $("#mrSwitch").bootstrapSwitch({
-            size: "small",
-            labelText: "MRI"
-        });
+        // Overlay select
+        $('.selectpicker').selectpicker().change(function() {
+            overlayMode = $(this).val();
 
-        $("#mrSwitch").on('switchChange.bootstrapSwitch', function(event, state) {
-            mrOn = !mrOn;
+            if (overlayMode == "DOSE") {
+                $("#doseSliderDiv").css("visibility", "visible");
+
+            } else {
+                $("#doseSliderDiv").css("visibility", "hidden");
+            }
+
+            if (overlayMode == "NONE") {
+                $("#alphaSliderDiv").css("visibility", "hidden");
+            } else {
+                $("#alphaSliderDiv").css("visibility", "visible");
+            }
+
             cornerstone.updateImage(element);
         });
-
 
         // Tooltips
         $(function(){
@@ -390,8 +408,10 @@ function setupImage() {
     // Enable the dicomImage element
     cornerstone.enable(element);
     cornerstone.enable(doseElement);
-    cornerstone.enable(petElement);
-    cornerstone.enable(mrElement);
+
+    if (_.contains(overlays, "PT"))  { cornerstone.enable(petElement); }
+    if (_.contains(overlays, "MR1")) { cornerstone.enable(mr1Element); }
+    if (_.contains(overlays, "MR2")) { cornerstone.enable(mr2Element); }
 
     var synchronizer = new cornerstoneTools.Synchronizer("CornerstoneNewImage", cornerstoneTools.stackImageIndexSynchronizer);
 
@@ -445,25 +465,39 @@ function setupImage() {
         synchronizer.add(doseElement);
     });
 
-    cornerstone.loadImage(petStack.imageIds[0]).then(function(petImage) {
-        // Set the stack as tool state
-        cornerstoneTools.addStackStateManager(petElement, ['stack']);
-        cornerstoneTools.addToolState(petElement, 'stack', petStack);
+    if (_.contains(overlays, "PT")) {
+        cornerstone.loadImage(petStack.imageIds[0]).then(function(petImage) {
+            // Set the stack as tool state
+            cornerstoneTools.addStackStateManager(petElement, ['stack']);
+            cornerstoneTools.addToolState(petElement, 'stack', petStack);
 
-        cornerstoneTools.stackPrefetch.enable(petElement, 3);
+            cornerstoneTools.stackPrefetch.enable(petElement, 3);
 
-        synchronizer.add(petElement);
-    });
+            synchronizer.add(petElement);
+        });
+    }
 
-    cornerstone.loadImage(mrStack.imageIds[0]).then(function(mrImage) {
-        // Set the stack as tool state
-        cornerstoneTools.addStackStateManager(mrElement, ['stack']);
-        cornerstoneTools.addToolState(mrElement, 'stack', mrStack);
+    if (_.contains(overlays, "MR1")) {
+        cornerstone.loadImage(mr1Stack.imageIds[0]).then(function(mrImage) {
+            // Set the stack as tool state
+            cornerstoneTools.addStackStateManager(mr1Element, ['stack']);
+            cornerstoneTools.addToolState(mr1Element, 'stack', mr1Stack);
 
-        cornerstoneTools.stackPrefetch.enable(mrElement, 3);
+            cornerstoneTools.stackPrefetch.enable(mr1Element, 3);
 
-        synchronizer.add(mrElement);
-    });
+            synchronizer.add(mr1Element);
+        });
+    }
 
-    
+    if (_.contains(overlays, "MR2")) {
+        cornerstone.loadImage(mr2Stack.imageIds[0]).then(function(mrImage) {
+            // Set the stack as tool state
+            cornerstoneTools.addStackStateManager(mr2Element, ['stack']);
+            cornerstoneTools.addToolState(mr2Element, 'stack', mr2Stack);
+
+            cornerstoneTools.stackPrefetch.enable(mr2Element, 3);
+
+            synchronizer.add(mr2Element);
+        });
+    }
 }

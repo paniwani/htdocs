@@ -70,7 +70,7 @@ function drawDose(ctx, colormap, threshold, max) {
         d.data[i]     = colormap[f][0]
         d.data[i+1]   = colormap[f][1]
         d.data[i+2]   = colormap[f][2]
-        d.data[i+3]   = 150; // alpha on scale 0-255
+        d.data[i+3]   = Math.round( overlayAlpha * 255 );
     }
 
     var canvasTemp = $("#canvasTemp").get(0);
@@ -100,7 +100,7 @@ function drawPET(ctx, colormap) {
         d.data[i]     = colormap[f][0]
         d.data[i+1]   = colormap[f][1]
         d.data[i+2]   = colormap[f][2]
-        d.data[i+3]   = 150; // alpha on scale 0-255
+        d.data[i+3]   = Math.round( overlayAlpha * 255 );
     }
 
     var canvasTemp = $("#canvasTemp").get(0);
@@ -111,8 +111,8 @@ function drawPET(ctx, colormap) {
 
 }
 
-function drawMRI(ctx) {
-    var mrImageObject = cornerstone.getImage(mrElement);
+function drawMRI(ctx, elem) {
+    var mrImageObject = cornerstone.getImage(elem);
     if (mrImageObject === undefined) return;
     var mrCanvas = mrImageObject.getCanvas();
     var mrCtx = mrCanvas.getContext("2d");
@@ -120,7 +120,7 @@ function drawMRI(ctx) {
     var d = mrCtx.getImageData(0, 0, mrCanvas.width, mrCanvas.height);
 
     for (var i = 0; i < d.data.length; i += 4) {
-        d.data[i+3]   = 220; // alpha on scale 0-255
+        d.data[i+3]   = Math.round( overlayAlpha * 255 );
     }
 
     var canvasTemp = $("#canvasTemp").get(0);

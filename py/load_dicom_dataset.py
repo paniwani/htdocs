@@ -32,7 +32,8 @@ dataset = "DP_17333717" # TODO: Only load DP for now
 dataset_dir = os.path.join(inDir, dataset)
 CT_dir = os.path.join(dataset_dir, "CT")
 PT_dir = os.path.join(dataset_dir, "PTCT")
-MR_dir = os.path.join(dataset_dir, "MR_T1")
+MR1_dir = os.path.join(dataset_dir, "MR1")
+MR2_dir = os.path.join(dataset_dir, "MR2")
 
 # Get image file names
 
@@ -113,15 +114,20 @@ with open(dsDir + "/contours.json", "w") as outfile:
 
 print "Saved contours.json"
 
+overlays = []
+
 # Get and save RT dose
+overlays.append("DOSE")
 os.makedirs(os.path.join(dsDir, "Dose"))
 rtDose = RTDose(CT_image, rtDoseFile)
 sitk.WriteImage(rtDose.image, [os.path.join(dsDir, "Dose", "dose.{0}.jpg".format(i)) for i in range(rtDose.image.GetSize()[2], 0, -1)], True) # Write dose in backwards order
 cur.execute("UPDATE images SET doseMaximum=%s WHERE id=%s", (rtDose.maximum, imageID)) 
 print "Saved dose files as jpeg"
 
+
 # Get and save PET if it exists
 if os.path.isdir(PT_dir):
+  overlays.append("PT")
   rtPET = RTPET(CT_image, PT_dir)
   out_PT_dir = os.path.join(dsDir, "PT")
   os.makedirs(out_PT_dir)
@@ -130,12 +136,24 @@ if os.path.isdir(PT_dir):
   print "Saved PET"
 
 # Get and save PET if it exists
-if os.path.isdir(MR_dir):
-  rtMR = RTMR(CT_image, MR_dir)
-  out_MR_dir = os.path.join(dsDir, "MR")
+if os.path.isdir(MR1_dir):
+  overlays.append("MR1")
+  rtMR = RTMR(CT_image, MR1_dir)
+  out_MR_dir = os.path.join(dsDir, "MR1")
   os.makedirs(out_MR_dir)
-  sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
+  sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR1.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
   print "Saved MRI"
+
+if os.path.isdir(MR2_dir):
+  overlays.append("MR2")
+  rtMR = RTMR(CT_image, MR2_dir)
+  out_MR_dir = os.path.join(dsDir, "MR2")
+  os.makedirs(out_MR_dir)
+  sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR2.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
+  print "Saved MRI"
+
+# Update overlays in db
+cur.execute("UPDATE images SET overlays=%s WHERE id=%s", (",".join([str(x) for x in overlays]), imageID))
 
 # Close database
 db.commit()

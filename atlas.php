@@ -47,6 +47,8 @@ foreach ($regions as $region) {
   }
 }
 
+$overlays = explode(",", $img["overlays"]);
+
 $conn->close();
 ?>
 
@@ -56,6 +58,7 @@ $conn->close();
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-slider.min.css" rel="stylesheet">
     <link href="css/bootstrap-switch.min.css" rel="stylesheet">
+    <link href="css/bootstrap-select.min.css" rel="stylesheet">
     <link href="css/atlas.css" rel="stylesheet">
     
     <!-- Fonts -->
@@ -116,18 +119,17 @@ $conn->close();
               <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li>
             </ul>
 
-            <ul class="nav nav-pills" id="overlayBtns">
-              <li>
-                <input type="checkbox" name="doseSwitch" id="doseSwitch">
-              </li>
+            <select class="selectpicker show-tick pull-right" id="overlaySelect" data-width="150px" data-style="btn-primary">
+             
+              <option value="NONE">Select Overlay</option>
 
-              <li>
-                <input type="checkbox" name="petSwitch" id="petSwitch">
-              </li>
+              <?php foreach($overlays as $overlay): ?>
 
-              <li>
-                <input type="checkbox" name="mrSwitch" id="mrSwitch">
-              </li>
+              <option><?= $overlay ?></option>
+
+              <?php endforeach; ?>
+
+            </select> 
 
             </ul>
 
@@ -164,6 +166,11 @@ $conn->close();
 
                 <div id="doseSliderDiv">
                   <input type="text" id="doseSlider" />
+                </div>
+
+                <div id="alphaSliderDiv">
+                  <input type="text" id="alphaSlider" />
+                  <p id="alphaText">Alpha</p>
                 </div>
             </div>
 
@@ -263,14 +270,13 @@ $conn->close();
     <div class="row">
       <div id="doseImage"></div>
       <div id="petImage"></div>
-      <div id="mrImage"></div>
+      <div id="mr1Image"></div>
+      <div id="mr2Image"></div>
       <canvas id="canvasTemp" width="512" height="512"></canvas>
     </div>
 </div>
 
-
-
-<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>" data-dosemaximum="<?= $img['doseMaximum'] ?>"></div>
+<div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>" data-dosemaximum="<?= $img['doseMaximum'] ?>" data-overlays="<?= $img['overlays'] ?>"></div>
 
 </body>
 
@@ -278,6 +284,7 @@ $conn->close();
 <script src="js/bootstrap.min.js"></script>
 <script src="js/bootstrap-slider.min.js"></script>
 <script src="js/bootstrap-switch.min.js"></script>
+<script src="js/bootstrap-select.min.js"></script>
 <script src="js/cornerstone.min.js"></script>
 <script src="js/cornerstoneMath.min.js"></script>
 <script src="js/cornerstoneTools.min.js"></script>
