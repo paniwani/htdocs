@@ -7,9 +7,10 @@ import os
 from numpy import *
 
 class RTMR(object):
-  def __init__(self, CT_image, MR_dir):
+  def __init__(self, CT_image, MR_dir, invert_transform_flag):
     self.CT_image = CT_image
     self.MR_dir = MR_dir
+    self.invert_transform_flag = invert_transform_flag
     self.parse()
 
   # Get transform matrix which defines rotation and translation
@@ -32,8 +33,8 @@ class RTMR(object):
     reader = sitk.ImageSeriesReader()
     MR_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(self.MR_dir))
 
-    print "MR origin: %s" % str(MR_image.GetOrigin())
-    print "MR direction: %s" % str(MR_image.GetDirection())
+    # print "MR origin: %s" % str(MR_image.GetOrigin())
+    # print "MR direction: %s" % str(MR_image.GetDirection())
 
     # Get transform from dicom SRO
     rotation, translation = self.getTransform()
@@ -41,8 +42,9 @@ class RTMR(object):
     transform.SetMatrix(rotation)
     transform.SetTranslation(translation)
 
-    # Use inverse of the transform. Not entirely sure why but the registration works perfectly when inversed.
-    transform = transform.GetInverse()
+    # Use inverse of the transform if needed
+    if self.invert_transform_flag:
+        transform = transform.GetInverse()
 
     # print "Inverted transform:"
     # print transform
@@ -55,9 +57,9 @@ class RTMR(object):
     minMaxFilter.Execute(MR_image)
     minimum = minMaxFilter.GetMinimum()
     maximum = minMaxFilter.GetMaximum()
-    print "MRI image:"
-    print "Min: %s" % minimum
-    print "Max: %s" % maximum
+    # print "MRI image:"
+    # print "Min: %s" % minimum
+    # print "Max: %s" % maximum
 
     # Rescale and cast to unsigned 8 bit
     MR_image = sitk.Cast(sitk.RescaleIntensity(MR_image, 0, 255), sitk.sitkUInt8)

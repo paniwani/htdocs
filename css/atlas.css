@@ -145,6 +145,11 @@ button {
 .region {
   width: 140px;
   padding: 1px 0 1px 0;
+  cursor: pointer;
+}
+
+.region input {
+  cursor: pointer;
 }
 
 .highlighted {
@@ -183,15 +188,22 @@ button {
 
 #alphaSliderDiv {
   visibility: hidden;
-
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
 }
 
 #alphaSlider {
-  width: 75px;
-  height: 20px;
+  position: absolute;
+  width: 20px;
+  height: 100px;
+  bottom: 30px;
+  right: -50px;
+}
+
+#alphaSlider .slider-tick-label-container .slider-tick-label {
+  width: 50px;
+  margin-top: 15px;
+  margin-bottom: 45px;
+  margin-left: -12px;
+  font-size: 14px;
 }
 
 #alphaSlider .slider-tick {
@@ -238,6 +250,18 @@ body#auth {
 
 #overlaySelect {
   margin-right: 20px;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background-color: #0099FF;
+}
+
+#crumbs {
+  margin-left: 50px;
 }
 
 

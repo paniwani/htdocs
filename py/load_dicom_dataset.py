@@ -8,10 +8,12 @@ import csv
 import shutil
 import json
 import SimpleITK as sitk
+from openpyxl import load_workbook
 from RTStruct import RTStruct
 from RTDose import RTDose
 from RTPET import RTPET
 from RTMR import RTMR
+
 
 def usage():
   print "usage: python load_dicom_dataset.py input_directory output_directory"
@@ -24,43 +26,6 @@ if len(sys.argv)<2:
 inDir = sys.argv[1]
 outDir = sys.argv[2]
 
-# Get dataset
-datasets = os.walk(inDir).next()[1]
-
-# Setup directories
-dataset = "DP_17333717" # TODO: Only load DP for now
-dataset_dir = os.path.join(inDir, dataset)
-CT_dir = os.path.join(dataset_dir, "CT")
-PT_dir = os.path.join(dataset_dir, "PTCT")
-MR1_dir = os.path.join(dataset_dir, "MR1")
-MR2_dir = os.path.join(dataset_dir, "MR2")
-
-# Get image file names
-
-filenames = glob.glob(os.path.join(CT_dir, "CT*.dcm"))
-numSlices = len(filenames)
-image1 = sorted(filenames)[0]
-imageBaseName = image1.split(CT_dir)[1].split(".1.dcm")[0].split("/")[1]
-filenames = [os.path.join(CT_dir, (imageBaseName + "." + str(i) + ".dcm")) for i in range(1,numSlices+1)]
-
-rtStructFile = glob.glob(os.path.join(dataset_dir, "RS*.dcm"))[0]
-rtDoseFile   = glob.glob(os.path.join(dataset_dir, "RD*.dcm"))[0]
-
-print "Image base name: " + imageBaseName
-print "Number of slices: " + str(numSlices)
-print "RT Struct File Name: " + rtStructFile
-print "RT Dose File Name: " + rtDoseFile
-
-# TODO: Get image description
-description = ""
-# with open('../description.txt', 'rU') as f:
-#     reader = csv.reader(f, dialect='excel', delimiter='\t')
-#     for row in reader:
-#         if row[0] == dataset:
-#           description = row[1]
-#           break
-
-print "Image description: " + description
 
 # Connect to database
 db = MySQLdb.connect(host="localhost", # your host, usually localhost
@@ -70,90 +35,153 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor()
 
-# Get image information
-ds = dicom.read_file(image1)
-numRows = ds.Rows
-numCols = ds.Columns
-pixelSpacing = float(ds.PixelSpacing[0])
-patientOrigin = [float(x) for x in ds.ImagePositionPatient[0:2]]
+# Read image information from excel spreadsheet
+wb = load_workbook(filename= os.path.join(inDir, "atlas_case_list_test.xlsx"), read_only=True)
+ws = wb['H&N cases'] # ws is now an IterableWorksheet
 
-# Save image information to databse
-cur.execute("INSERT INTO images (name, basename, numRows, numCols, numSlices, pixelSpacing, description, doseMaximum) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (dataset, imageBaseName, numRows, numCols, numSlices, pixelSpacing, description, 0))
-imageID = cur.lastrowid
-print "Saved image to database"
+datasets = []
 
-# Convert image to jpeg and save to output directory
-dsDir = os.path.join(outDir, dataset)
-os.makedirs(dsDir)
-os.makedirs(dsDir + "/CT_jpg")
+for i, row in enumerate(ws.rows):
+  if i == 0:
+    continue
 
-for i in range(1, numSlices+1):
-  im = filenames[i-1]
-  imName = "CT.{0}.jpg".format(i)
+  if (row[0].value != None) and (i < 10):
+    dataset = {}
 
-  os.system("dcmj2pnm +oj +Jq 90 +Ww 20 400 %s %s" % (im, imName))
-  shutil.move(imName, dsDir + "/CT_jpg")
+    dataset['UID']                    = int(row[0].value)
+    dataset['INVERT_TRANSFORM']       = int(row[1].value)
+    dataset['MRN']                    = row[5].value.encode("utf-8").strip()  if (row[5].value != None) else ""
+    dataset['SITE']                   = row[6].value.encode("utf-8").strip()   if (row[6].value != None) else ""
+    dataset['SUBSITE']                = row[7].value.encode("utf-8").strip()   if (row[7].value != None) else ""
+    dataset['STAGE']                  = row[8].value.encode("utf-8").strip()   if (row[8].value != None) else ""
+    dataset['ASSESSMENT']             = row[10].value.encode("utf-8").strip()  if (row[10].value != None) else ""
+    dataset['PLAN']                   = row[11].value.encode("utf-8").strip()  if (row[11].value != None) else ""
+    dataset['TXSUMMARY']              = row[12].value.encode("utf-8").strip()  if (row[12].value != None) else ""
+    dataset['PEARLS']                 = row[13].value.encode("utf-8").strip()  if (row[13].value != None) else ""
+    dataset['REFERENCES']             = row[14].value.encode("utf-8").strip()  if (row[14].value != None) else ""
 
-print "Converted dicom to jpeg"
+    datasets.append(dataset)
 
-# Load CT image
-reader = sitk.ImageSeriesReader()
-CT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(CT_dir))
+# Get datasets
 
-# Get and save RT struct
-rtStruct = RTStruct(rtStructFile)
-rtStruct.convertPatientToPixelCoordinates(patientOrigin, pixelSpacing)
+for dataset in datasets:
 
-for region in rtStruct.regions:
-  cur.execute("INSERT INTO regions (name, color, image_id, ROINumber, disabled) VALUES (%s, %s, %s, %s, %s)", (region["name"], region["color"], imageID, region["ROINumber"], 0))
+  print "\nDataset: %s" % dataset['MRN']
 
-print "Saved regions to database"
+  # Setup directories
+  dataset_dir = os.path.join(inDir, dataset['MRN'])
 
-with open(dsDir + "/contours.json", "w") as outfile:
-  json.dump(rtStruct.contours, outfile)
+  CT_dir = os.path.join(dataset_dir, "CT")
+  PT_dir = os.path.join(dataset_dir, "PTCT")
+  MR1_dir = os.path.join(dataset_dir, "MR1")
+  MR2_dir = os.path.join(dataset_dir, "MR2")
 
-print "Saved contours.json"
+  # Get image file names
 
-overlays = []
+  filenames = glob.glob(os.path.join(CT_dir, "CT*.dcm"))
+  numSlices = len(filenames)
+  image1 = sorted(filenames)[0]
+  imageBaseName = image1.split(CT_dir)[1].split(".1.dcm")[0].split("/")[1]
+  filenames = [os.path.join(CT_dir, (imageBaseName + "." + str(i) + ".dcm")) for i in range(1,numSlices+1)]
 
-# Get and save RT dose
-overlays.append("DOSE")
-os.makedirs(os.path.join(dsDir, "Dose"))
-rtDose = RTDose(CT_image, rtDoseFile)
-sitk.WriteImage(rtDose.image, [os.path.join(dsDir, "Dose", "dose.{0}.jpg".format(i)) for i in range(rtDose.image.GetSize()[2], 0, -1)], True) # Write dose in backwards order
-cur.execute("UPDATE images SET doseMaximum=%s WHERE id=%s", (rtDose.maximum, imageID)) 
-print "Saved dose files as jpeg"
+  rtStructFile = glob.glob(os.path.join(dataset_dir, "RS*.dcm"))[0]
+  rtDoseFile   = glob.glob(os.path.join(dataset_dir, "RD*.dcm"))[0]
+
+  # Get image information
+  ds = dicom.read_file(image1)
+  numRows = ds.Rows
+  numCols = ds.Columns
+  pixelSpacing = float(ds.PixelSpacing[0])
+  patientOrigin = [float(x) for x in ds.ImagePositionPatient[0:2]]
+
+  # Create unique name
+  name = "Patient." + str(dataset['UID'])
+
+  # Save image information to databse
+  cur.execute("INSERT INTO images (id, name, numRows, numCols, numSlices, pixelSpacing) VALUES (%s, %s, %s, %s, %s, %s)", (dataset['UID'], name, numRows, numCols, numSlices, pixelSpacing))
+  imageID = cur.lastrowid
+  print "Saved image to database"
+
+  # Save image case information to databse
+  cur.execute("UPDATE images SET invert_transform=%s, site=%s, subsite=%s, stage=%s, assessment=%s, plan=%s, txsummary=%s, pearls=%s, reference=%s WHERE id=%s", (dataset['INVERT_TRANSFORM'], dataset['SITE'], dataset['SUBSITE'], dataset['STAGE'], dataset['ASSESSMENT'], dataset['PLAN'], dataset['TXSUMMARY'], dataset['PEARLS'], dataset['REFERENCES'], imageID)) 
+
+  # Convert image to jpeg and save to output directory
+  dsDir = os.path.join(outDir, name)
+  os.makedirs(dsDir)
+  os.makedirs(dsDir + "/CT_jpg")
+
+  for i in range(1, numSlices+1):
+    im = filenames[i-1]
+    imName = "CT.{0}.jpg".format(i)
+
+    os.system("dcmj2pnm +oj +Jq 90 +Ww 20 400 %s %s" % (im, imName))
+    shutil.move(imName, dsDir + "/CT_jpg")
+
+  print "Converted dicom to jpeg"
+
+  # Load CT image
+  reader = sitk.ImageSeriesReader()
+  CT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(CT_dir))
+
+  # Get and save RT struct
+  rtStruct = RTStruct(rtStructFile)
+  rtStruct.convertPatientToPixelCoordinates(patientOrigin, pixelSpacing)
+
+  for region in rtStruct.regions:
+    cur.execute("INSERT INTO regions (name, color, image_id, ROINumber, disabled) VALUES (%s, %s, %s, %s, %s)", (region["name"], region["color"], imageID, region["ROINumber"], 0))
+
+  print "Saved regions to database"
+
+  with open(dsDir + "/contours.json", "w") as outfile:
+    json.dump(rtStruct.contours, outfile)
+
+  print "Saved contours.json"
+
+  overlays = []
+
+  # Get and save RT dose
+  overlays.append("DOSE")
+  os.makedirs(os.path.join(dsDir, "Dose"))
+  rtDose = RTDose(CT_image, rtDoseFile)
+  sitk.WriteImage(rtDose.image, [os.path.join(dsDir, "Dose", "dose.{0}.jpg".format(i)) for i in range(rtDose.image.GetSize()[2], 0, -1)], True) # Write dose in backwards order
+  cur.execute("UPDATE images SET doseMaximum=%s WHERE id=%s", (rtDose.maximum, imageID)) 
+  print "Saved dose"
 
 
-# Get and save PET if it exists
-if os.path.isdir(PT_dir):
-  overlays.append("PT")
-  rtPET = RTPET(CT_image, PT_dir)
-  out_PT_dir = os.path.join(dsDir, "PT")
-  os.makedirs(out_PT_dir)
-  sitk.WriteImage(rtPET.PT_image, [os.path.join(out_PT_dir, "PT.{0}.jpg".format(i)) for i in range(rtPET.PT_image.GetSize()[2], 0, -1)], True)
-  cur.execute("UPDATE images SET PET_SUVbw_scale_factor=%s WHERE id=%s", (rtPET.SUVbw_scale_factor, imageID)) 
-  print "Saved PET"
+  invertFlag = dataset['INVERT_TRANSFORM'] == 1
 
-# Get and save PET if it exists
-if os.path.isdir(MR1_dir):
-  overlays.append("MR1")
-  rtMR = RTMR(CT_image, MR1_dir)
-  out_MR_dir = os.path.join(dsDir, "MR1")
-  os.makedirs(out_MR_dir)
-  sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR1.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
-  print "Saved MRI"
+  # Get and save PET if it exists
+  if os.path.isdir(PT_dir):
+    overlays.append("PT")
 
-if os.path.isdir(MR2_dir):
-  overlays.append("MR2")
-  rtMR = RTMR(CT_image, MR2_dir)
-  out_MR_dir = os.path.join(dsDir, "MR2")
-  os.makedirs(out_MR_dir)
-  sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR2.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
-  print "Saved MRI"
+    rtPET = RTPET(CT_image, PT_dir, invertFlag)
+    out_PT_dir = os.path.join(dsDir, "PT")
+    os.makedirs(out_PT_dir)
+    sitk.WriteImage(rtPET.PT_image, [os.path.join(out_PT_dir, "PT.{0}.jpg".format(i)) for i in range(rtPET.PT_image.GetSize()[2], 0, -1)], True)
+    cur.execute("UPDATE images SET PET_SUVbw_scale_factor=%s WHERE id=%s", (rtPET.SUVbw_scale_factor, imageID)) 
+    print "Saved PET"
 
-# Update overlays in db
-cur.execute("UPDATE images SET overlays=%s WHERE id=%s", (",".join([str(x) for x in overlays]), imageID))
+  # Get and save PET if it exists
+  if os.path.isdir(MR1_dir):
+    overlays.append("MR1")
+
+    rtMR = RTMR(CT_image, MR1_dir, invertFlag)
+    out_MR_dir = os.path.join(dsDir, "MR1")
+    os.makedirs(out_MR_dir)
+    sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR1.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
+    print "Saved MRI T1"
+
+  if os.path.isdir(MR2_dir):
+    overlays.append("MR2")
+
+    rtMR = RTMR(CT_image, MR2_dir, invertFlag)
+    out_MR_dir = os.path.join(dsDir, "MR2")
+    os.makedirs(out_MR_dir)
+    sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR2.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
+    print "Saved MRI T2"
+
+  # Update overlays in db
+  cur.execute("UPDATE images SET overlays=%s WHERE id=%s", (",".join([str(x) for x in overlays]), imageID))
 
 # Close database
 db.commit()

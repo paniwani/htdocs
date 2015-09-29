@@ -79,12 +79,20 @@ $conn->close();
 
       <div id="navbar" class="navbar-collapse collapse">
 
+        <ul class="nav navbar-nav navbar-left">
+          <ol class="breadcrumb" id="crumbs">
+            <li><a href="#"><?= $img['site'] ?></a></li>
+            <li><a href="#"><?= ucwords($img['subsite']) ?></a></li>
+            <li class="active">Case #<?= $img['id'] ?></li>
+          </ol>
+        </ul>
+
         <ul class="nav navbar-nav navbar-right">
-          <div id="logged-in">
+          <div id="logged-in pull-right">
             <?php include("views/logged_in.php"); ?>
           </div>
         </ul>
-      </div><!--/.nav-collapse -->
+      </div>
     </div>
   </nav>
 
@@ -105,7 +113,7 @@ $conn->close();
 <div class="container" id="mainContainer">
     <div class="row" id="description">
         <div class="col-md-12">
-          <p><?= $img["description"] ?></p>
+          <p><?= $img["assessment"] ?></p>
         </div>
     </div>
     
@@ -123,11 +131,30 @@ $conn->close();
              
               <option value="NONE">Select Overlay</option>
 
-              <?php foreach($overlays as $overlay): ?>
+              <?php 
+                foreach($overlays as $overlay): 
 
-              <option><?= $overlay ?></option>
+                  switch ($overlay) {
+                    case "DOSE":
+                      echo "<option value='DOSE'>RT Dose</option>";
+                      break;
 
-              <?php endforeach; ?>
+                    case "PT":
+                      echo "<option value='PT'>PET/CT</option>";
+                      break;
+
+                    case "MR1":
+                      echo "<option value='MR1'>MRI T1-weighted</option>";
+                      break;
+
+                    case "MR2":
+                      echo "<option value='MR2'>MRI T2-weighted</option>";
+                      break;
+                  }
+
+                endforeach;
+
+              ?>
 
             </select> 
 
@@ -143,9 +170,7 @@ $conn->close();
                 <div id="dicomImage" oncontextmenu="return false" tabindex="0">
 
 
-                    <div id="imgtopleft">
-                      <div id="imgNameText"><?= $img["name"] ?></div>
-                    </div>
+                    <div id="imgtopleft"></div>
                     <div id="imgtopright">
                         <div id="zoomText">Zoom: </div>
                         <div id="sliceText">Image: </div>
@@ -170,7 +195,6 @@ $conn->close();
 
                 <div id="alphaSliderDiv">
                   <input type="text" id="alphaSlider" />
-                  <p id="alphaText">Alpha</p>
                 </div>
             </div>
 

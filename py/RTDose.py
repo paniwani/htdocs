@@ -62,7 +62,7 @@ class RTDose(object):
     minimum = minMaxFilter.GetMinimum()
     maximum = minMaxFilter.GetMaximum()
 
-    print "\nResampled Dose maximum: %s" % maximum
+    # print "\nResampled Dose maximum: %s" % maximum
 
     # Convert dose values to RGB colormap
     # doseImage = sitk.ScalarToRGBColormap(doseImage, sitk.ScalarToRGBColormapImageFilter.Jet)

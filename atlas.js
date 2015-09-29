@@ -191,7 +191,7 @@ $(function() {
         });
 
         var doseMax = imgdata.dosemaximum;
-        var ticks = _.range(0, doseMax, 10);
+        var ticks = _.range(0, doseMax, doseMax > 35 ? 10 : 5);
         if ( (doseMax % 10) !== 0 ) { ticks.push(doseMax) }
         
         var ticksStrings = [];
@@ -210,7 +210,7 @@ $(function() {
             ticks_labels: ticksStrings,
             value: 2, // threshold dose at 2 Gy
             tooltip: "hide"
-        }).on("slideStop", function(data) {
+        }).on("slide", function(data) {
             doseThreshold = data.value;
             cornerstone.updateImage(element);
         });
@@ -218,13 +218,14 @@ $(function() {
         // Alpha slider
         $("#alphaSlider").slider({
             id: "alphaSlider",
+            orientation: "vertical",
+            reversed: false,
             min: 0,
             max: 1,
             step: 0.1,
             value: overlayAlpha,
             ticks: [0, 1],
-            ticks_labels: [0, 1],
-            ticks_snap_bounds: 0
+            ticks_labels: ["CT SIM", "Overlay"]
         }).on("slide", function(data) {
             overlayAlpha = data.value;
             cornerstone.updateImage(element);
@@ -446,10 +447,10 @@ function setupImage() {
         // Set default viewport
         viewport = cornerstone.getViewport(element);
         viewport.scale = 2.5;
-        viewport.translation = {
-            x: -3.6,
-            y: 33.2
-        };
+        // viewport.translation = {
+        //     x: -3.6,
+        //     y: 33.2
+        // };
         cornerstone.setViewport(element, viewport);
 
         synchronizer.add(element);

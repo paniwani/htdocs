@@ -7,9 +7,10 @@ import os
 from numpy import *
 
 class RTPET(object):
-  def __init__(self, CT_image, PT_dir):
+  def __init__(self, CT_image, PT_dir, invert_transform_flag = True):
     self.CT_image = CT_image
     self.PT_dir = PT_dir
+    self.invert_transform_flag = invert_transform_flag
     self.parse()
 
   # Convert PET pixel data from BQML units to SUV bw
@@ -63,9 +64,9 @@ class RTPET(object):
     minMaxFilter = sitk.MinimumMaximumImageFilter()
     minMaxFilter.Execute(image)
     maximum = minMaxFilter.GetMaximum()
-    print "\n" + caption
-    print "Max: %s\n" % maximum
-    return maximum
+    # print "\n" + caption
+    # print "Max: %s\n" % maximum
+    # return maximum
 
   def parse(self):
 
@@ -73,8 +74,8 @@ class RTPET(object):
     reader = sitk.ImageSeriesReader()
     PT_image = sitk.ReadImage(reader.GetGDCMSeriesFileNames(self.PT_dir))
 
-    print "PT origin: %s" % str(PT_image.GetOrigin())
-    print "PT direction: %s" % str(PT_image.GetDirection())
+    # print "PT origin: %s" % str(PT_image.GetOrigin())
+    # print "PT direction: %s" % str(PT_image.GetDirection())
 
     self.printMax(PT_image, "Original PET Image - BQML")
 
@@ -84,8 +85,9 @@ class RTPET(object):
     transform.SetMatrix(rotation)
     transform.SetTranslation(translation)
 
-    # Use inverse of the transform. Not entirely sure why but the registration works perfectly when inversed.
-    transform = transform.GetInverse()
+    # Use inverse of the transform if needed
+    if self.invert_transform_flag:
+        transform = transform.GetInverse()
 
     # Resample PET onto CT with linear interpolation and using transform
     PT_image = sitk.Resample(PT_image, self.CT_image, transform)
