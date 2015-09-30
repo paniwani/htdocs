@@ -20,7 +20,7 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$result = $conn->query("SELECT * FROM IMAGES");
+$result = $conn->query("SELECT * FROM images");
 var_dump($result);
 
 
