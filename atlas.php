@@ -145,7 +145,7 @@ $conn->close();
 
                   <?php endforeach; ?>
 
-                  <input type="checkbox" id="OAR_switch" checked>
+                  <input type="checkbox" id="OAR_switch" data-label-text="Contours" checked>
 
                 </div>
                   
@@ -166,7 +166,7 @@ $conn->close();
 
                   <?php endforeach; ?>
 
-                  <input type="checkbox" id="TV_switch" checked>
+                  <input type="checkbox" id="TV_switch" data-label-text="Contours" checked>
                 
                 </div>
               </div>
@@ -260,6 +260,7 @@ $conn->close();
                 <div id="alphaSliderDiv">
                   <input type="text" id="alphaSlider" />
                 </div>
+
             </div>
 
             <div class="row">

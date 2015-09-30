@@ -258,6 +258,10 @@ body#auth {
   cursor: pointer;
 }
 
+table#cases {
+  font-size: 16px;
+}
+
 #cases tr.clickable-row:hover {
   background-color: #9933CC;
 }
