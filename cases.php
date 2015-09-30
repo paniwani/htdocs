@@ -20,10 +20,6 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$result = $conn->query("SELECT * FROM images");
-var_dump($result);
-
-
 ?>
 
 <!DOCTYPE HTML>
@@ -81,7 +77,7 @@ var_dump($result);
       <tbody>
 
         <?php
-          
+          $result = $conn->query("SELECT * FROM images");
           
           while ($img = $result->fetch_assoc()):
         ?>
