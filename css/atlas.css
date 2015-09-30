@@ -1,21 +1,22 @@
-body {
+/*body {
   background-color: black;
   color: white;
-}
+}*/
 
 #dicomImageWrapper {
   width: 600px;
   height: 600px;
   position: relative;
-  color: white;
+  /*color: white;*/
   outline: 0 none;
-  margin: 0 75px 0 75px;
+  /*margin: 0 75px 0 75px;*/
+  margin: 0;
   clear: both;
 }
 
 #toolbar {
   float: left;
-  margin-left: 75px;
+  /*margin-left: 75px;*/
 }
 
 #overlayBtns {
@@ -120,7 +121,7 @@ button {
 
 .directions p {
   font-size: 10px;
-  color: gray;
+  /*color: gray;*/
   margin: 5px 0 0 0;
 }
 
@@ -164,8 +165,8 @@ button {
   position: absolute;
   width: 20px;
   height: 210px;
-  top: 50px;
-  left: -100px;
+  top: 20px;
+  left: -70px;
 }
 
 #doseSlider .slider-selection {
@@ -195,7 +196,7 @@ button {
   width: 20px;
   height: 100px;
   bottom: 30px;
-  right: -50px;
+  right: -60px;
 }
 
 #alphaSlider .slider-tick-label-container .slider-tick-label {
@@ -216,36 +217,37 @@ button {
 
 #logged-in {
   font-size: 14px;
-  color: white;
+  /*color: white;*/
 }
 
 #auth-messages {
   text-align: center;
-  color: white;
+  /*color: white;*/
 }
 
 .form-signin {
-  color: white;
+  /*color: white;*/
 }
 
 body#auth {
-  background-color: black;
+  /*background-color: black;*/
 }
 
 #logo {
+  color: white;
   font-family: 'Poiret One', cursive;
   text-align: center;
   font-size: 30px;
 }
 
 #mainNavBar {
-  background-color: black;
+  /*background-color: black;*/
   border: none;
   margin-bottom: 10px;
 }
 
 #mainNavBar .nav > li > a {
-  color: white;
+  /*color: white;*/
 }
 
 #overlaySelect {
@@ -256,15 +258,21 @@ body#auth {
   cursor: pointer;
 }
 
-.clickable-row:hover {
-  background-color: #0099FF;
+#cases tr.clickable-row:hover {
+  background-color: #9933CC;
 }
 
 #crumbs {
   margin-left: 50px;
 }
 
+.bootstrap-switch {
+  margin-top: 25px;
+}
 
+#pearls-header {
+  margin: 0;
+}
 
 
 

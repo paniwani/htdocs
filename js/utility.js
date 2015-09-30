@@ -36,8 +36,9 @@ function drawContours(ctx, contours, ignoreRegions, highlightedRegions, hoverReg
         var regionId = c.ROINumber;
 
         var hoverFlag = (regionId == hoverRegion);
+        var ignoreFlag = _.contains(ignoreRegions, regionId);
 
-        if (!_.contains(ignoreRegions, regionId) || hoverFlag ) {
+        if (!ignoreFlag) {
             highlightFlag = hoverFlag || _.contains(highlightedRegions, regionId);
             drawContour(c.points, c.color, ctx, highlightFlag);
         }

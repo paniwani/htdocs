@@ -51,7 +51,6 @@ if ($login->isUserLoggedIn() == true) {
 
     <title>eContour</title>
 
-    <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/atlas.css" rel="stylesheet">
 

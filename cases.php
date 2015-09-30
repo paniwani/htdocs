@@ -25,7 +25,11 @@ if ($conn->connect_error) {
 <!DOCTYPE HTML>
 <html>
 <head>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/cyborg/bootstrap.min.css" rel="stylesheet">
+    
+
     <link href="css/atlas.css" rel="stylesheet">
     
     <!-- Fonts -->
@@ -56,9 +60,9 @@ if ($conn->connect_error) {
   </nav>
 
   <div class="container">
-    <h1>Cases</h1>
+    <h1 class="page-header">Cases</h1>
 
-    <table class="table">
+    <table class="table table-striped" id="cases">
 
       <thead>
         <tr>

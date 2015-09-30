@@ -56,6 +56,7 @@ $conn->close();
 <html>
 <head>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+     
     <link href="css/bootstrap-slider.min.css" rel="stylesheet">
     <link href="css/bootstrap-switch.min.css" rel="stylesheet">
     <link href="css/bootstrap-select.min.css" rel="stylesheet">
@@ -81,8 +82,8 @@ $conn->close();
 
         <ul class="nav navbar-nav navbar-left">
           <ol class="breadcrumb" id="crumbs">
-            <li><a href="#"><?= $img['site'] ?></a></li>
-            <li><a href="#"><?= ucwords($img['subsite']) ?></a></li>
+            <li><a href="/cases.php"><?= $img['site'] ?></a></li>
+            <li><a href="/cases.php"><?= ucwords($img['subsite']) ?></a></li>
             <li class="active">Case #<?= $img['id'] ?></li>
           </ol>
         </ul>
@@ -95,9 +96,6 @@ $conn->close();
       </div>
     </div>
   </nav>
-
-
-
 
 <div class="container" id="progressContainer">
   <div class="progress">
@@ -118,7 +116,73 @@ $conn->close();
     </div>
     
     <div class="row">
-        <div class="col-md-8">
+
+
+        <div class="col-md-2" id="legend">
+
+          <div class="row">
+
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#OAR_regions" aria-controls="OAR_regions" role="tab" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Organs At Risk">OARs</span></a></li>
+                <li role="presentation"><a href="#TV_regions" aria-controls="TV_regions" role="tab" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Treatment Volumes">TVs</span></a></li>
+              </ul>
+
+              <div class="tab-content">
+                <div class="tab-pane fade active in" id="OAR_regions">
+                  
+                  <?php foreach($regions_OAR as $region): ?>
+
+                    <div class="region" data-id=<?= $region['ROINumber'] ?>>
+
+                      <div class="checkbox">
+                          <input type="checkbox" class="label_checkboxes" checked> 
+
+                          <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
+                          <div class="regionName"><?= $region["name"] ?></div>
+                      </div>
+                      
+                    </div>
+
+                  <?php endforeach; ?>
+
+                  <input type="checkbox" id="OAR_switch" checked>
+
+                </div>
+                  
+                <div class="tab-pane fade in" id="TV_regions">
+                  
+                  <?php foreach($regions_TV as $region): ?>
+
+                    <div class="region" data-id=<?= $region['ROINumber'] ?>>
+
+                      <div class="checkbox">
+                          <input type="checkbox" class="label_checkboxes" checked> 
+
+                          <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
+                          <div class="regionName"><?= $region["name"] ?></div>
+                      </div>
+                      
+                    </div>
+
+                  <?php endforeach; ?>
+
+                  <input type="checkbox" id="TV_switch" checked>
+                
+                </div>
+              </div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+
+
+
+        <div class="col-md-7">
 
             <ul class="nav nav-pills" id="toolbar">
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
@@ -218,77 +282,30 @@ $conn->close();
             </div>
         </div>
 
-        <div class="col-md-4" id="legend">
-          <div class="row">
-
-            <div class="col-md-6" id="OAR-regions">
-
-                <h5>OARs</h5>
-
-                <?php 
-                  foreach($regions_OAR as $region):
-                ?>
-
-                <div class="region" data-id=<?= $region['ROINumber'] ?>>
-
-                  <div class="checkbox">
-                      <input type="checkbox" checked> 
-
-                      <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                      <div class="regionName"><?= $region["name"] ?></div>
-                  </div>
-                  
-                </div>
-
-                <?php endforeach; ?>
-
-
-            </div>
-
-            <div class="col-md-6" id="TV-regions">
-
-                <h5>Target Volumes</h5>
-
-                <?php 
-                  foreach($regions_TV as $region):
-                ?>
-
-                <div class="region" data-id=<?= $region['ROINumber'] ?>>
-
-                  <div class="checkbox">
-                      <input type="checkbox" checked> 
-
-                      <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                      <div class="regionName"><?= $region["name"] ?></div>
-                  </div>
-                  
-                </div>
-
-                <?php endforeach; ?>
-
-
-            </div>
-
-          </div>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-default" id="OAR_on">On</button>
-                <button type="button" class="btn btn-sm btn-default" id="OAR_off">Off</button>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-default" id="TV_on">On</button>
-                <button type="button" class="btn btn-sm btn-default" id="TV_off">Off</button>
-              </div>
-            </div>
-          </div>
-
-
+        <div class="col-md-3">
+          <h4 class="page-header" id="pearls-header">Clinical Pearls</h4>
+            <ul>
+              <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+              <li>Aliquam tincidunt mauris eu risus.</li>
+              <li>Vestibulum auctor dapibus neque.</li>
+              <li>Nunc dignissim risus id metus.</li>
+              <li>Cras ornare tristique elit.</li>
+              <li>Vivamus vestibulum nulla nec ante.</li>
+              <li>Praesent placerat risus quis eros.</li>
+              <li>Fusce pellentesque suscipit nibh.</li>
+              <li>Integer vitae libero ac risus egestas placerat.</li>
+              <li>Vestibulum commodo felis quis tortor.</li>
+              <li>Ut aliquam sollicitudin leo.</li>
+              <li>Cras iaculis ultricies nulla.</li>
+              <li>Donec quis dui at dolor tempor interdum.</li>
+              <li>Vivamus molestie gravida turpis.</li>
+              <li>Fusce lobortis lorem at ipsum semper sagittis.</li>
+              <li>Nam convallis pellentesque nisl.</li>
+              <li>Integer malesuada commodo nulla.</li>
+            </ul> 
         </div>
+
+        
     </div>
 
     <div class="row" id="overlayImages">
@@ -301,6 +318,7 @@ $conn->close();
 </div>
 
 <div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>" data-dosemaximum="<?= $img['doseMaximum'] ?>" data-overlays="<?= $img['overlays'] ?>"></div>
+
 
 </body>
 

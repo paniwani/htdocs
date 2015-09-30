@@ -168,14 +168,14 @@ $(function() {
         // Toolbar
         $("#zoom-in").click(function() {
             viewport = cornerstone.getViewport(element);
-            viewport.scale += 0.5;
+            viewport.scale += 0.25;
             cornerstone.setViewport(element, viewport);
         });
 
         $("#zoom-out").click(function() {
             viewport = cornerstone.getViewport(element);
-            if (viewport.scale > 0.5) {
-                viewport.scale -= 0.5;
+            if (viewport.scale > 0.25) {
+                viewport.scale -= 0.25;
                 cornerstone.setViewport(element, viewport);
             }
         });  
@@ -328,10 +328,35 @@ $(function() {
         });
 
         // On/Off OARs and TVs
-        $("#OAR_off").click(function() { changeAllContours("OAR", false, ignoreRegions); });
-        $("#OAR_on").click(function()  { changeAllContours("OAR", true, ignoreRegions); });
-        $("#TV_off").click(function()  { changeAllContours("TV", false, ignoreRegions); });
-        $("#TV_on").click(function()   { changeAllContours("TV", true, ignoreRegions); });
+        // $("#OAR_off").click(function() { changeAllContours("OAR", false, ignoreRegions); });
+        // $("#OAR_on").click(function()  { changeAllContours("OAR", true, ignoreRegions); });
+        // $("#TV_off").click(function()  { changeAllContours("TV", false, ignoreRegions); });
+        // $("#TV_on").click(function()   { changeAllContours("TV", true, ignoreRegions); });
+
+
+        $.fn.bootstrapSwitch.defaults.offColor = "danger";
+        $.fn.bootstrapSwitch.defaults.size = "small";
+
+        $("#OAR_switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', function(event, state) {
+
+          if (state == true) {
+            changeAllContours("OAR", true, ignoreRegions);
+          } else {
+            changeAllContours("OAR", false, ignoreRegions);
+          }
+
+        });
+
+        $("#TV_switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', function(event, state) {
+          
+          if (state == true) {
+            changeAllContours("TV", true, ignoreRegions);
+          } else {
+            changeAllContours("TV", false, ignoreRegions);
+          }
+
+        });
+
 
         // Re-focus for keyboard to work
         $("body").click(function() {
@@ -378,12 +403,12 @@ function onImageProgressLoaded (event, args){
 function changeAllContours(regionType, flag, ignoreRegions) {
     var el;
     if (regionType == "OAR") {
-        el = $("#OAR-regions");
+        el = $("#OAR_regions");
     } else if (regionType == "TV") {
-        el = $("#TV-regions");
+        el = $("#TV_regions");
     }
 
-    inputs = $(el).find("input[type='checkbox']");
+    inputs = $(el).find("input.label_checkboxes");
 
     for (var i=0; i < inputs.length; i++) {
         input = inputs[i];
@@ -446,7 +471,7 @@ function setupImage() {
 
         // Set default viewport
         viewport = cornerstone.getViewport(element);
-        viewport.scale = 2.5;
+        viewport.scale = 2.75;
         // viewport.translation = {
         //     x: -3.6,
         //     y: 33.2
