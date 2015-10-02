@@ -124,7 +124,7 @@ $conn->close();
 
               <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#OAR_regions" aria-controls="OAR_regions" role="tab" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Organs At Risk">OARs</span></a></li>
-                <li role="presentation"><a href="#TV_regions" aria-controls="TV_regions" role="tab" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Treatment Volumes">TVs</span></a></li>
+                <li role="presentation"><a href="#TV_regions" aria-controls="TV_regions" role="tab" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Treatment Volumes">Targets</span></a></li>
               </ul>
 
               <div class="tab-content">

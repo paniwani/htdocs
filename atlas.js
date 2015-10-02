@@ -166,16 +166,18 @@ $(function() {
         });
 
         // Toolbar
+        var zoomSize = 0.5;
+
         $("#zoom-in").click(function() {
             viewport = cornerstone.getViewport(element);
-            viewport.scale += 0.25;
+            viewport.scale += zoomSize;
             cornerstone.setViewport(element, viewport);
         });
 
         $("#zoom-out").click(function() {
             viewport = cornerstone.getViewport(element);
-            if (viewport.scale > 0.25) {
-                viewport.scale -= 0.25;
+            if (viewport.scale > zoomSize) {
+                viewport.scale -= zoomSize;
                 cornerstone.setViewport(element, viewport);
             }
         });  
@@ -490,7 +492,7 @@ function setupImage() {
 
         // Set default viewport
         viewport = cornerstone.getViewport(element);
-        viewport.scale = 2.75;
+        viewport.scale = 2.5;
         // viewport.translation = {
         //     x: -3.6,
         //     y: 33.2
