@@ -394,9 +394,28 @@ function onImageProgressLoaded (event, args){
 
     if ((loadProgress["remaining"] / loadProgress["total"]) === 0) {
         console.timeEnd("Stack Loading");
+
+
+
+
         $("#progressContainer").hide();
         $("#mainContainer").css("visibility", "visible");
         $(element).focus();
+
+        // Scroll to middle of image
+        // Using hacky method of simulating key press up
+
+        var e = $.Event("keydown", { keyCode: 38}); // keyboard up
+        var middle = Math.round(stack.imageIds.length/2);
+        
+        // Trigger key event with delay in each iteration of the loop
+        // http://stackoverflow.com/questions/3583724/how-do-i-add-a-delay-in-a-javascript-loop
+        (function myLoop (i) {          
+           setTimeout(function () {   
+              $(element).trigger(e);          
+              if (--i) myLoop(i);
+           }, 10) // speed in msec
+        })(middle);
     }
 }
 
