@@ -56,6 +56,34 @@ if ($conn->connect_error) {
   </nav>
 
   <div class="container">
+
+    <!-- <ul class="nav nav-pills" id="sites-nav">
+      <li role="presentation" class="active"><a href="#">H&N</a></li>
+      <li role="presentation"><a href="#">CNS</a></li>
+      <li role="presentation"><a href="#">Thorax</a></li>
+      <li role="presentation"><a href="#">Breast</a></li>
+      <li role="presentation"><a href="#">GI</a></li>
+      <li role="presentation"><a href="#">GU</a></li>
+      <li role="presentation"><a href="#">GYN</a></li>
+      <li role="presentation"><a href="#">Lymphoma</a></li>
+      <li role="presentation"><a href="#">Thorax</a></li>
+      <li role="presentation"><a href="#">MSK/Sarcoma</a></li>
+    </ul> -->
+
+    <div class="btn-group btn-group-lg" role="group" id="sites">
+      <button type="button" class="btn btn-primary">H&N</button>
+      <button type="button" class="btn btn-default">CNS</button>
+      <button type="button" class="btn btn-default">Thorax</button>
+      <button type="button" class="btn btn-default">Breast</button>
+      <button type="button" class="btn btn-default">GI</button>
+      <button type="button" class="btn btn-default">GU</button>
+      <button type="button" class="btn btn-default">GYN</button>
+      <button type="button" class="btn btn-default">Lymphoma</button>
+      <button type="button" class="btn btn-default">MSK</button>
+    </div>
+
+    <br />
+
     <h2 class="page-header">Cases</h2>
 
     <table class="table table-striped" id="cases">

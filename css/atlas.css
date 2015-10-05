@@ -1,8 +1,3 @@
-/*body {
-  background-color: black;
-  color: white;
-}*/
-
 #dicomImageWrapper {
   width: 600px;
   height: 600px;
@@ -294,7 +289,11 @@ table#cases {
   padding-top: 10px;
 }
 
-
+#sites {
+  width: 800px;
+  margin: 0 auto;
+  display: block;
+}
 
 
 
