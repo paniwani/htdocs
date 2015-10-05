@@ -130,6 +130,8 @@ $conn->close();
               <div class="tab-content">
                 <div class="tab-pane fade active in" id="OAR_regions">
                   
+                  <input type="checkbox" id="OAR_switch" data-label-text="Contours" checked>
+
                   <?php foreach($regions_OAR as $region): ?>
 
                     <div class="region" data-id=<?= $region['ROINumber'] ?>>
@@ -145,12 +147,12 @@ $conn->close();
 
                   <?php endforeach; ?>
 
-                  <input type="checkbox" id="OAR_switch" data-label-text="Contours" checked>
-
                 </div>
                   
                 <div class="tab-pane fade in" id="TV_regions">
                   
+                  <input type="checkbox" id="TV_switch" data-label-text="Contours" checked>
+
                   <?php foreach($regions_TV as $region): ?>
 
                     <div class="region" data-id=<?= $region['ROINumber'] ?>>
@@ -166,8 +168,7 @@ $conn->close();
 
                   <?php endforeach; ?>
 
-                  <input type="checkbox" id="TV_switch" data-label-text="Contours" checked>
-                
+                  
                 </div>
               </div>
 
@@ -283,27 +284,31 @@ $conn->close();
             </div>
         </div>
 
-        <div class="col-md-3">
-          <h4 class="page-header" id="pearls-header">Clinical Pearls</h4>
-            <ul>
-              <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
-              <li>Aliquam tincidunt mauris eu risus.</li>
-              <li>Vestibulum auctor dapibus neque.</li>
-              <li>Nunc dignissim risus id metus.</li>
-              <li>Cras ornare tristique elit.</li>
-              <li>Vivamus vestibulum nulla nec ante.</li>
-              <li>Praesent placerat risus quis eros.</li>
-              <li>Fusce pellentesque suscipit nibh.</li>
-              <li>Integer vitae libero ac risus egestas placerat.</li>
-              <li>Vestibulum commodo felis quis tortor.</li>
-              <li>Ut aliquam sollicitudin leo.</li>
-              <li>Cras iaculis ultricies nulla.</li>
-              <li>Donec quis dui at dolor tempor interdum.</li>
-              <li>Vivamus molestie gravida turpis.</li>
-              <li>Fusce lobortis lorem at ipsum semper sagittis.</li>
-              <li>Nam convallis pellentesque nisl.</li>
-              <li>Integer malesuada commodo nulla.</li>
-            </ul> 
+        <div class="col-md-3" >
+          
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#plan" aria-controls="plan" role="tab" data-toggle="tab">RT Plan</a></li>
+            <li role="presentation"><a href="#pearls" aria-controls="pearls" role="tab" data-toggle="tab">Clinical Pearls</a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <div class="tab-pane fade active in" id="plan">
+              <p><?= $img['plan'] ?></p>
+            </div>
+
+            <div class="tab-pane fade in" id="pearls">
+              <?php
+                if (empty($img['pearls'])) {
+                  echo "<p>No clinical pearls available yet.</p>";
+                } else {
+                  echo $img['pearls'];
+                }
+              ?>
+            </div>
+              
+          </div>
+
         </div>
 
         

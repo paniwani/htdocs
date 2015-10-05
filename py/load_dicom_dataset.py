@@ -7,6 +7,7 @@ import MySQLdb
 import csv
 import shutil
 import json
+import HTMLParser
 import SimpleITK as sitk
 from openpyxl import load_workbook
 from RTStruct import RTStruct
@@ -36,7 +37,7 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 cur = db.cursor()
 
 # Read image information from excel spreadsheet
-wb = load_workbook(filename= os.path.join(inDir, "atlas_case_list_test.xlsx"), read_only=True)
+wb = load_workbook(filename= os.path.join(inDir, "atlas_case_list.xlsx"), read_only=True)
 ws = wb['H&N cases'] # ws is now an IterableWorksheet
 
 datasets = []
@@ -45,20 +46,18 @@ for i, row in enumerate(ws.rows):
   if i == 0:
     continue
 
-  if (row[0].value != None) and (i < 10):
+  if (row[0].value != None) and (i < 100):
     dataset = {}
 
     dataset['UID']                    = int(row[0].value)
     dataset['INVERT_TRANSFORM']       = int(row[1].value)
-    dataset['MRN']                    = row[5].value.encode("utf-8").strip()  if (row[5].value != None) else ""
+    dataset['MRN']                    = row[5].value.encode("utf-8").strip()   if (row[5].value != None) else ""
     dataset['SITE']                   = row[6].value.encode("utf-8").strip()   if (row[6].value != None) else ""
     dataset['SUBSITE']                = row[7].value.encode("utf-8").strip()   if (row[7].value != None) else ""
     dataset['STAGE']                  = row[8].value.encode("utf-8").strip()   if (row[8].value != None) else ""
-    dataset['ASSESSMENT']             = row[10].value.encode("utf-8").strip()  if (row[10].value != None) else ""
-    dataset['PLAN']                   = row[11].value.encode("utf-8").strip()  if (row[11].value != None) else ""
-    dataset['TXSUMMARY']              = row[12].value.encode("utf-8").strip()  if (row[12].value != None) else ""
+    dataset['ASSESSMENT']             = row[9].value.encode("utf-8").strip()   if (row[9].value != None) else ""
+    dataset['PLAN']                   = row[10].value.encode("utf-8").strip()  if (row[10].value != None) else ""
     dataset['PEARLS']                 = row[13].value.encode("utf-8").strip()  if (row[13].value != None) else ""
-    dataset['REFERENCES']             = row[14].value.encode("utf-8").strip()  if (row[14].value != None) else ""
 
     datasets.append(dataset)
 
@@ -103,7 +102,7 @@ for dataset in datasets:
   print "Saved image to database"
 
   # Save image case information to databse
-  cur.execute("UPDATE images SET invert_transform=%s, site=%s, subsite=%s, stage=%s, assessment=%s, plan=%s, txsummary=%s, pearls=%s, reference=%s WHERE id=%s", (dataset['INVERT_TRANSFORM'], dataset['SITE'], dataset['SUBSITE'], dataset['STAGE'], dataset['ASSESSMENT'], dataset['PLAN'], dataset['TXSUMMARY'], dataset['PEARLS'], dataset['REFERENCES'], imageID)) 
+  cur.execute("UPDATE images SET invert_transform=%s, site=%s, subsite=%s, stage=%s, assessment=%s, plan=%s, pearls=%s WHERE id=%s", (dataset['INVERT_TRANSFORM'], dataset['SITE'], dataset['SUBSITE'], dataset['STAGE'], dataset['ASSESSMENT'], dataset['PLAN'], dataset['PEARLS'], imageID)) 
 
   # Convert image to jpeg and save to output directory
   dsDir = os.path.join(outDir, name)

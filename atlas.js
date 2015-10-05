@@ -329,12 +329,8 @@ $(function() {
             cornerstone.setViewport(element, viewport);
         });
 
-        // On/Off OARs and TVs
-        // $("#OAR_off").click(function() { changeAllContours("OAR", false, ignoreRegions); });
-        // $("#OAR_on").click(function()  { changeAllContours("OAR", true, ignoreRegions); });
-        // $("#TV_off").click(function()  { changeAllContours("TV", false, ignoreRegions); });
-        // $("#TV_on").click(function()   { changeAllContours("TV", true, ignoreRegions); });
-
+        // Open all links in pearls in new tab
+        $("#pearls a").attr("target", "_blank");
 
         $.fn.bootstrapSwitch.defaults.offColor = "danger";
         $.fn.bootstrapSwitch.defaults.size = "small";

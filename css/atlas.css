@@ -35,12 +35,6 @@
   outline: 0 none;
 }
 
-#doseImage {
-  width: 600px;
-  height: 600px;
-  display: none;
-}
-
 #overlayImages {
   display: none;
 }
@@ -165,7 +159,7 @@ button {
   position: absolute;
   width: 20px;
   height: 210px;
-  top: 20px;
+  top: 150px;
   left: -70px;
 }
 
@@ -271,11 +265,38 @@ table#cases {
 }
 
 .bootstrap-switch {
-  margin-top: 25px;
+  display: block;
+  width: 115px;
+  margin: 15px auto;
 }
 
 #pearls-header {
   margin: 0;
+}
+
+#pearls {
+  height: 650px;
+  overflow: auto;
+  font-size: 13px;
+  padding-top: 10px;
+}
+
+#pearls ul {
+  padding-left: 20px;
+}
+
+#pearls ul li {
+  padding-bottom: 6px;
+}
+
+#legend .tab-pane {
+  height: 650px;
+  overflow: auto;
+}
+
+#plan {
+  font-size: 16px;
+  padding-top: 10px;
 }
 
 
