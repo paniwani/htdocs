@@ -209,11 +209,11 @@ $conn->close();
                       break;
 
                     case "MR1":
-                      echo "<option value='MR1'>MRI T1-weighted</option>";
+                      echo "<option value='MR1'>MRI T1+C</option>";
                       break;
 
                     case "MR2":
-                      echo "<option value='MR2'>MRI T2-weighted</option>";
+                      echo "<option value='MR2'>MRI T2</option>";
                       break;
                   }
 
