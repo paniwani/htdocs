@@ -233,6 +233,23 @@ $(function() {
             cornerstone.updateImage(element);
         });
 
+        // Slice range slider
+        var range = $("#slice-range").get(0);
+        range.min = 1;
+        range.step = 1;
+        range.max = stack.imageIds.length - 1;
+        range.value = Math.round(stack.imageIds.length/2);
+        $("#slice-range").on("input", rangeSelectImage);
+
+        // Update slider when image changes
+
+        $(element).on("CornerstoneNewImage", function(event) {
+          var range = $("#slice-range").get(0);
+          if (range.value != stack.currentImageIdIndex) {
+            range.value = stack.currentImageIdIndex;
+          }
+        }); 
+
         // Overlay select
         $('.selectpicker').selectpicker().change(function() {
             overlayMode = $(this).val();
@@ -412,7 +429,7 @@ function onImageProgressLoaded (event, args){
            setTimeout(function () {   
               $(element).trigger(e);          
               if (--i) myLoop(i);
-           }, 10) // speed in msec
+           }, 3) // speed in msec
         })(middle);
     }
 }
@@ -445,6 +462,21 @@ function changeAllContours(regionType, flag, ignoreRegions) {
         }
     }
     cornerstone.updateImage(element);
+}
+
+function rangeSelectImage(event) {
+
+  // Get the range input value
+  var newImageIdIndex = parseInt(event.currentTarget.value, 10);
+
+  // Switch images, if necessary
+  if(newImageIdIndex !== stack.currentImageIdIndex && stack.imageIds[newImageIdIndex] !== undefined) {
+      cornerstone.loadAndCacheImage(stack.imageIds[newImageIdIndex]).then(function(image) {
+          var viewport = cornerstone.getViewport(element);
+          stack.currentImageIdIndex = newImageIdIndex;
+          cornerstone.displayImage(element, image, viewport);
+      });
+  }
 }
 
 function setupImage() {

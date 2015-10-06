@@ -79,7 +79,7 @@ if ($conn->connect_error) {
       <button type="button" class="btn btn-default">GU</button>
       <button type="button" class="btn btn-default">GYN</button>
       <button type="button" class="btn btn-default">Lymphoma</button>
-      <button type="button" class="btn btn-default">MSK</button>
+      <button type="button" class="btn btn-default">Sarcoma</button>
     </div>
 
     <br />

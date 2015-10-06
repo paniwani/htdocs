@@ -232,7 +232,6 @@ body#auth {
 #mainNavBar {
   /*background-color: black;*/
   border: none;
-  margin-bottom: 10px;
 }
 
 #mainNavBar .nav > li > a {
@@ -293,6 +292,11 @@ table#cases {
   width: 800px;
   margin: 0 auto;
   display: block;
+}
+
+#slice-range {
+  margin: 8px 0;
+  width: 600px;
 }
 
 

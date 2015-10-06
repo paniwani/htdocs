@@ -223,7 +223,9 @@ $conn->close();
 
             </select> 
 
-            </ul>
+            
+            <input type="range" id="slice-range">
+            
 
             <div id="dicomImageWrapper"
                  class="cornerstone-enabled-image"
@@ -264,24 +266,6 @@ $conn->close();
 
             </div>
 
-            <div class="row">
-              <div class="col-md-8">
-
-                <div class="directions">
-                  <p>Use mouse or keyboard arrows up/down to scroll through images.</p>
-                  <p>Scroll over and click labels to highlight contour.</p>
-                </div>
-
-              </div>
-
-              <div class="col-md-4">
-                <div class="btn-group" role="group" id="ww-presets">
-                  <button type="button" class="btn btn-sm btn-default" id="tissue">Tissue</button>
-                  <button type="button" class="btn btn-sm btn-default" id="lung">Lung</button>
-                  <button type="button" class="btn btn-sm btn-default" id="bone">Bone</button>
-                </div>
-              </div>
-            </div>
         </div>
 
         <div class="col-md-3" >
