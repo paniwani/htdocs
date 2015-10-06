@@ -235,7 +235,7 @@ $(function() {
 
         // Slice range slider
         var range = $("#slice-range").get(0);
-        range.min = 1;
+        range.min = 0;
         range.step = 1;
         range.max = stack.imageIds.length - 1;
         range.value = Math.round(stack.imageIds.length/2);

@@ -1,6 +1,7 @@
 import dicom
 from numpy import *
 import pdb
+import re
 
 class RTStruct(object):
   def __init__(self, filename):
@@ -13,7 +14,10 @@ class RTStruct(object):
     # Get regions
     regions = []
     for r in ds.StructureSetROISequence:
-      regions.append( { "ROINumber": int(r.ROINumber), "name": r.ROIName } )
+      n = r.ROIName
+      if n == 'BODY':
+        n = 'Body'
+      regions.append( { "ROINumber": int(r.ROINumber), "name": n.capitalize() } )
 
     # Get contour data
     contours = []
@@ -27,6 +31,14 @@ class RTStruct(object):
           regionIndex = i
           regions[i]["color"] = ROIDisplayColor
           break
+
+      # Skip specific regions based on name
+      n = regions[regionIndex]['name']
+      if re.search(r'\biso\b|dc=0', n, re.IGNORECASE):
+        print "Removed region: %s" % n
+        del regions[regionIndex]
+        continue
+
 
       try: 
         ROIContourSequence.ContourSequence
@@ -68,3 +80,7 @@ class RTStruct(object):
         pixelPoints.append( { "x": x, "y": y } )
 
       c["points"] = pixelPoints
+
+
+
+
