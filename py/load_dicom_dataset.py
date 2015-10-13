@@ -37,8 +37,8 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 cur = db.cursor()
 
 # Read image information from excel spreadsheet
-wb = load_workbook(filename= os.path.join(inDir, "atlas_case_list.xlsx"), read_only=True)
-ws = wb['H&N cases'] # ws is now an IterableWorksheet
+wb = load_workbook(filename = "/Users/neil/Dropbox/Contouring/atlas_case_list_official.xlsx", read_only = True)
+ws = wb['Active Case List'] # ws is now an IterableWorksheet
 
 datasets = []
 
@@ -49,20 +49,31 @@ for i, row in enumerate(ws.rows):
   if (row[0].value != None) and (i < 100):
     dataset = {}
 
+    # Only include cases marked for astro
+    if (row[1].value != 'yes'):
+      # print 'Excluding this case because it is not marked for astro'
+      continue
+
     dataset['UID']                    = int(row[0].value)
-    dataset['INVERT_TRANSFORM']       = int(row[1].value)
-    dataset['MRN']                    = row[5].value.encode("utf-8").strip()   if (row[5].value != None) else ""
-    dataset['SITE']                   = row[6].value.encode("utf-8").strip()   if (row[6].value != None) else ""
-    dataset['SUBSITE']                = row[7].value.encode("utf-8").strip()   if (row[7].value != None) else ""
-    dataset['STAGE']                  = row[8].value.encode("utf-8").strip()   if (row[8].value != None) else ""
-    dataset['ASSESSMENT']             = row[9].value.encode("utf-8").strip()   if (row[9].value != None) else ""
-    dataset['PLAN']                   = row[10].value.encode("utf-8").strip()  if (row[10].value != None) else ""
-    dataset['PEARLS']                 = row[13].value.encode("utf-8").strip()  if (row[13].value != None) else ""
+        
+    dataset['SITE']                   = row[5].value.encode("utf-8").strip()   if (row[5].value != None) else ""
+    dataset['SUBSITE']                = row[6].value.encode("utf-8").strip()   if (row[6].value != None) else ""
+    dataset['STAGE']                  = row[7].value.encode("utf-8").strip()   if (row[7].value != None) else ""
+    dataset['ASSESSMENT']             = row[8].value.encode("utf-8").strip()   if (row[8].value != None) else ""
+    dataset['PLAN']                   = row[9].value.encode("utf-8").strip()   if (row[9].value != None) else ""
+    dataset['PEARLS']                 = row[12].value.encode("utf-8").strip()  if (row[12].value != None) else ""
+
+    dataset['INVERT_TRANSFORM']       = int(row[14].value)
+
+    # Use anonymized MRN
+    dataset['MRN'] = "PATIENT" + str(dataset['UID'])
 
     datasets.append(dataset)
 
-# Get datasets
+print "Loading the following patients: "
+print ','.join([str(ds['UID']) for ds in datasets])
 
+# Get datasets
 for dataset in datasets:
 
   print "\nDataset: %s" % dataset['MRN']

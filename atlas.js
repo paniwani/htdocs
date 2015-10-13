@@ -16,7 +16,7 @@ $(function() {
     var hoverRegion = 0;
     var stackContours = [];
     var imageIds = [];
-    var doseThreshold = 2;
+    var doseThreshold = 1;
 
     var doseImageIds = [];
     var petImageIds = [];
@@ -193,25 +193,28 @@ $(function() {
         });
 
         var doseMax = imgdata.dosemaximum;
+        console.log(doseMax);
         var ticks = _.range(0, doseMax, doseMax > 35 ? 10 : 5);
-        if ( (doseMax % 10) !== 0 ) { ticks.push(doseMax) }
+        // if ( (doseMax % 5) !== 0 ) { ticks.push(doseMax) }
         
         var ticksStrings = [];
         for (var i=0; i < ticks.length; i++) {
             ticksStrings.push( ticks[i] + " Gy");
         }
         ticksStrings.reverse();
-        ticks[0] = 2; // Default minimum threshold
+        ticks[0] = 0;
 
         // Dose slider
         $("#doseSlider").slider({
             id: "doseSlider",
             orientation: "vertical",
             reversed: true,
+            min: 0,
+            max: doseMax,
+            step: 1,
             ticks: ticks,
             ticks_labels: ticksStrings,
-            value: 2, // threshold dose at 2 Gy
-            tooltip: "hide"
+            value: 0
         }).on("slide", function(data) {
             doseThreshold = data.value;
             cornerstone.updateImage(element);
@@ -378,6 +381,13 @@ $(function() {
             $(element).focus();
         });
 
+        // Adjust one-liner font size if needed
+        while ($("#one-liner").height() > 50) {
+            var fs = parseInt( $("#one-liner").css("font-size") );
+            $("#one-liner").css("font-size", --fs + "px");
+        };
+        $("#one-liner").css("height", "50px");
+
         // Now that we have the whole contour stack, setup and load the image
         setupImage();
     });
@@ -398,6 +408,8 @@ function onImageProgressLoaded (event, args){
     loadProgress["remaining"] = imIds.length;
     loadProgress["percentLoaded"] = parseInt(100 - loadProgress["remaining"] / loadProgress["total"] * 100, 10);
 
+    // console.log("Percent loaded: " + loadProgress["percentLoaded"])
+
     // Update progress bar in DOM
     var pb = $("#progress-bar");
     pb.attr("aria-valuenow", loadProgress["percentLoaded"]);
@@ -410,8 +422,7 @@ function onImageProgressLoaded (event, args){
     if ((loadProgress["remaining"] / loadProgress["total"]) === 0) {
         console.timeEnd("Stack Loading");
 
-
-
+        console.log("Finished loading stacks");
 
         $("#progressContainer").hide();
         $("#mainContainer").css("visibility", "visible");

@@ -68,7 +68,54 @@ $conn->close();
     <title>Rad Onc Atlas</title>
 </head>
 
-<body>
+<body id="atlas">
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="Help">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Instructions</h4>
+        </div>
+        
+        <div class="modal-body">
+          <h5>Navigation</h5>
+          <ul>
+            <li>To scroll through images: keyboard up/down, scroll with mouse, or use slider</li>
+            <li>Use the toolbar to zoom in, zoom out, and pan</li>
+          </ul>
+
+          <h5>Contours</h5>
+          <ul>
+            <li>Legend on the left is used to manipulate contours, which are divided into:
+              <ul>
+                <li>Organs at risk (OARs)</li>
+                <li>Target volumes</li>
+              </ul>
+            </li>
+
+            <li>Use the toggle located at the top of the legend to turn all contours on/off</li>
+            <li>Scroll over a contour label to highlight it on the image</li>
+            <li>Click on a contour label to enable highlighting through different image slices</li>
+            <li>Use the checkboxes to turn individual contours on/off</li>
+          </ul>
+
+          <h5>Overlays</h5>
+          <ul>
+            <li>Click on Select Overlay to choose from possible image overlays, i.e. RT Dose or PET/CT</li>
+            <li>Use the sliders to manipulate the overlay blending and adjust dose threshold</li>
+          </ul>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Static navbar -->
   <nav id="mainNavBar" class="navbar navbar-default navbar-static-top">
@@ -111,7 +158,7 @@ $conn->close();
 <div class="container" id="mainContainer">
     <div class="row" id="description">
         <div class="col-md-12">
-          <p><?= $img["assessment"] ?></p>
+          <p id="one-liner"><?= $img["assessment"] ?></p>
         </div>
     </div>
     
@@ -128,7 +175,7 @@ $conn->close();
               </ul>
 
               <div class="tab-content">
-                <div class="tab-pane fade active in" id="OAR_regions">
+                <div class="tab-pane fade active in regions-tab" id="OAR_regions">
                   
                   <input type="checkbox" id="OAR_switch" data-label-text="Contours" checked>
 
@@ -149,7 +196,7 @@ $conn->close();
 
                 </div>
                   
-                <div class="tab-pane fade in" id="TV_regions">
+                <div class="tab-pane fade in regions-tab" id="TV_regions">
                   
                   <input type="checkbox" id="TV_switch" data-label-text="Contours" checked>
 
@@ -188,7 +235,7 @@ $conn->close();
             <ul class="nav nav-pills" id="toolbar">
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out" data-toggle="tooltip" data-placement="top" title="Zoom Out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-move" aria-hidden="true"></i></button></li>
+              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-hand-up" aria-hidden="true"></i></button></li>
               <!-- <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li> -->
             </ul>
 

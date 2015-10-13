@@ -1,11 +1,10 @@
 #dicomImageWrapper {
-  width: 600px;
-  height: 600px;
+  width: 550px;
+  height: 550px;
   position: relative;
   /*color: white;*/
   outline: 0 none;
-  /*margin: 0 75px 0 75px;*/
-  margin: 0;
+  margin: 0 auto;
   clear: both;
 }
 
@@ -21,8 +20,8 @@
 }
 
 #dicomImage {
-  width: 600px;
-  height: 600px;
+  width: 550px;
+  height: 550px;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -69,6 +68,10 @@
   right: 30px;
 }
 
+#image-data {
+  display: none;
+}
+
 .color-swatch {
   width:10px;
   height:10px;
@@ -78,17 +81,22 @@
 }
 
 #legend {
-  font-size:14px;
+  font-size: 14px;
 }
 
 #legend label {
   display: block;
 }
 
-body {
-  overflow:hidden;
+body#atlas {
+  height: 750px;
+  overflow: hidden;
   -moz-overflow: hidden;
-  margin-top:20px;
+}
+
+#mainNavBar {
+  border: none;
+  margin-top: 20px;
 }
 
 button {
@@ -114,11 +122,6 @@ button {
   margin: 5px 0 0 0;
 }
 
-/*.region {
-  width: 170px;
-  float:left;
-}*/
-
 .region .checkbox {
   margin: 0;
 }
@@ -134,8 +137,14 @@ button {
 
 .region {
   width: 140px;
-  padding: 1px 0 1px 0;
+  padding: 2px;
   cursor: pointer;
+  font-size: 13px;
+  margin-left: 14px;
+}
+
+.region input[type='checkbox'] {
+  margin-left: -16px;
 }
 
 .region input {
@@ -166,10 +175,9 @@ button {
 
 #doseSlider .slider-tick-label {
   width: 50px;
-  /*height: 50px;*/
   margin-left: 30px;
-  padding-top: 5px;
-  font-size: 12px;
+  padding-top: 10px;
+  font-size: 11px;
 }
 
 #doseSlider .slider-tick {
@@ -227,15 +235,6 @@ body#auth {
   font-family: 'Poiret One', cursive;
   text-align: center;
   font-size: 30px;
-}
-
-#mainNavBar {
-  /*background-color: black;*/
-  border: none;
-}
-
-#mainNavBar .nav > li > a {
-  /*color: white;*/
 }
 
 #overlaySelect {
@@ -297,6 +296,17 @@ table#cases {
 #slice-range {
   margin: 8px 0;
   width: 600px;
+}
+
+.regions-tab {
+  height: 500px;
+  overflow-y: auto;
+}
+
+#help {
+  padding-left: 10px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 

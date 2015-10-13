@@ -58,8 +58,9 @@ function drawDose(ctx, colormap, threshold, max) {
 
     for (var i = 0; i < d.data.length; i += 4) {
 
-        // Threshold dose color image
-        if (d.data[i] < threshold) {
+        // Threshold dose color image at the user threshold
+        // If no threshold is set, then anything less than 1 Gy should be transparent
+        if (d.data[i] < Math.max(threshold, 1)) {
             d.data[i+3] = 0; // Transparent
             continue;
         }
