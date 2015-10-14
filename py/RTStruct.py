@@ -21,7 +21,7 @@ class RTStruct(object):
       n = r.ROIName
       if n == 'BODY':
         n = 'Body'
-      regions.append( { "ROINumber": int(r.ROINumber), "name": n.capitalize() } )
+      regions.append( { "ROINumber": int(r.ROINumber), "name": n } )
 
     # Get contour data
     contours = []
