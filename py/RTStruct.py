@@ -13,11 +13,6 @@ class RTStruct(object):
   def parse(self):
 
 
-
-
-    pdb.set_trace()
-
-
     ds = dicom.read_file(self.filename)
 
     # Get regions
