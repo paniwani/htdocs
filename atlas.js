@@ -8,6 +8,7 @@ var loadProgress = {};
 var overlays;
 var overlayMode = "NONE";
 var overlayAlpha = 0.5;
+var zoom;
 
 $(function() {
     var imgdata = {};
@@ -32,6 +33,9 @@ $(function() {
 
     // Get image information from DOM
     imgdata = $('#image-data').data();
+
+    // Get zoom from imgdata
+    zoom = imgdata.zoom;
 
     // Get overlays
     overlays = imgdata.overlays.split(",");
@@ -531,11 +535,9 @@ function setupImage() {
 
         // Set default viewport
         viewport = cornerstone.getViewport(element);
-        viewport.scale = 2.5;
-        // viewport.translation = {
-        //     x: -3.6,
-        //     y: 33.2
-        // };
+
+        if (zoom) { viewport.scale = zoom }
+
         cornerstone.setViewport(element, viewport);
 
         synchronizer.add(element);

@@ -4,11 +4,20 @@ import pdb
 import re
 
 class RTStruct(object):
-  def __init__(self, filename):
+  def __init__(self, filename, remove_str, rename_str):
     self.filename = filename
+    self.remove_str = remove_str
+    self.rename_str = rename_str
     self.parse()
 
   def parse(self):
+
+
+
+
+    pdb.set_trace()
+
+
     ds = dicom.read_file(self.filename)
 
     # Get regions
