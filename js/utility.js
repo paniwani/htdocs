@@ -67,7 +67,7 @@ function drawDose(ctx, colormap, threshold, max) {
 
         var f = parseFloat(d.data[i] - min) / (max - min);
         if (f < 0) { f = 0; }
-        f = Math.round(f * (colormap.length-1));
+        f = Math.min( Math.round(f * (colormap.length-1)), colormap.length - 1);
         
         d.data[i]     = colormap[f][0]
         d.data[i+1]   = colormap[f][1]
