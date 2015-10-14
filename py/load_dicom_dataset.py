@@ -75,11 +75,6 @@ for i, row in enumerate(ws.rows):
 
     datasets.append(dataset)
 
-
-# REMOVE
-# ONLY FOR DEBUGGING
-datasets = datasets[0:2]
-
 print "Loading the following patients: "
 print ','.join([str(ds['UID']) for ds in datasets])
 
