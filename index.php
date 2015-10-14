@@ -69,6 +69,8 @@ if ($login->isUserLoggedIn() == true) {
 
   <body id="auth">
 
+    <?php include_once("analyticstracking.php") ?>
+
     <div class="container">
 
       <div class="row">

@@ -36,6 +36,8 @@ if ($conn->connect_error) {
 
 <body>
 
+  <?php include_once("analyticstracking.php") ?>
+
   <!-- Static navbar -->
   <nav id="mainNavBar" class="navbar navbar-default navbar-static-top">
     <div class="container">

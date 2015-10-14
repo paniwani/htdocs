@@ -70,6 +70,8 @@ $conn->close();
 
 <body id="atlas">
 
+  <?php include_once("analyticstracking.php") ?>
+
   <!-- Help Modal -->
   <div class="modal" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="Help">
     <div class="modal-dialog" role="document">
