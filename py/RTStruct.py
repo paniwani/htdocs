@@ -10,8 +10,28 @@ class RTStruct(object):
     self.rename_str = rename_str
     self.parse()
 
+  def parseRemove(self, s):
+    ra = s.split(',')
+    ra = map(str.strip, ra)
+    return ra
+
+  def parseRename(self, s):
+    ra = s.split(',')
+    ra = map(str.strip, ra)
+
+    rd = {}
+    for r in ra:
+      r = r.split('=')
+      r = map(str.strip, r)
+      oldname, newname = r
+      rd[oldname] = newname
+
+    return rd
+
   def parse(self):
 
+    remove_list     = self.parseRemove(self.remove_str) if self.remove_str else []
+    rename_dict     = self.parseRename(self.rename_str) if self.rename_str else {}
 
     ds = dicom.read_file(self.filename)
 
@@ -38,11 +58,15 @@ class RTStruct(object):
 
       # Skip specific regions based on name
       n = regions[regionIndex]['name']
-      if re.search(r'\biso\b|dc=0', n, re.IGNORECASE):
+      if re.search(r'\biso\b|dc=0', n, re.IGNORECASE) or (n in remove_list):
         print "Removed region: %s" % n
         del regions[regionIndex]
         continue
 
+      # Rename regions if needed
+      if n in rename_dict:
+        regions[regionIndex]['name'] = rename_dict[n]
+        print "Renamed region: %s --> %s" % (n, rename_dict[n])
 
       try: 
         ROIContourSequence.ContourSequence
