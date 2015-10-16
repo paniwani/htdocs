@@ -77,7 +77,7 @@ for i, row in enumerate(ws.rows):
 
 
 # DEBUGGING ONLY
-datasets = datasets[0:2]
+# datasets = datasets[0:2]
 
 print "Loading the following patients: "
 print ','.join([str(ds['UID']) for ds in datasets])
