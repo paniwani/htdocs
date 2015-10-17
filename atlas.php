@@ -160,10 +160,15 @@ $conn->close();
                     <div class="region" data-id=<?= $region['ROINumber'] ?>>
 
                       <div class="checkbox">
-                          <input type="checkbox" class="label_checkboxes" checked> 
 
-                          <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                          <div class="regionName"><?= $region["name"] ?></div>
+                          <label>
+                            <input type="checkbox" class="label_checkboxes" checked> 
+
+                            <div>
+                              <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div> 
+                              <p><?= $region["name"] ?></p>
+                            </div>
+                          </label>
                       </div>
                       
                     </div>
@@ -181,10 +186,15 @@ $conn->close();
                     <div class="region" data-id=<?= $region['ROINumber'] ?>>
 
                       <div class="checkbox">
-                          <input type="checkbox" class="label_checkboxes" checked> 
 
-                          <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div>
-                          <div class="regionName"><?= $region["name"] ?></div>
+                          <label>
+                            <input type="checkbox" class="label_checkboxes" checked> 
+
+                            <div>
+                              <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div> 
+                              <p><?= $region["name"] ?></p>
+                            </div>
+                          </label>
                       </div>
                       
                     </div>

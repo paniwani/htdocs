@@ -126,10 +126,6 @@ button {
   margin: 5px 0 0 0;
 }
 
-.region .checkbox {
-  margin: 0;
-}
-
 .btn:focus {
   outline: none;
 }
@@ -139,12 +135,19 @@ button {
   margin-top: 5px;
 }
 
+.region .checkbox {
+  margin: 0;
+}
+
+.region p {
+  margin: 0;
+}
+
 .region {
-  width: 140px;
+  width: 165px;
   padding: 2px;
   cursor: pointer;
   font-size: 13px;
-  margin-left: 14px;
 }
 
 .region input[type='checkbox'] {
@@ -303,7 +306,7 @@ table#cases {
 }
 
 #slice-range {
-  margin: 8px 0;
+  margin: 8px auto;
   width: 600px;
 }
 
