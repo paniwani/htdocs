@@ -1,3 +1,13 @@
+body#atlas {
+  height: 100%;
+  overflow: hidden;
+  -moz-overflow: hidden;
+}
+
+body#atlas .container {
+  width: 1150px;
+}
+
 #dicomImageWrapper {
   width: 550px;
   height: 550px;
@@ -86,12 +96,6 @@
 
 #legend label {
   display: block;
-}
-
-body#atlas {
-  height: 750px;
-  overflow: hidden;
-  -moz-overflow: hidden;
 }
 
 #mainNavBar {
@@ -193,7 +197,7 @@ button {
   width: 20px;
   height: 100px;
   bottom: 30px;
-  right: -60px;
+  right: -45px;
 }
 
 #alphaSlider .slider-tick-label-container .slider-tick-label {
@@ -237,7 +241,7 @@ body#auth {
   font-size: 30px;
 }
 
-#logo a, a:hover, a:visited, a:link, a:active {
+#logo a, #logo a:hover, #logo a:visited, #logo a:link, #logo a:active {
   color: white;
   text-decoration: none;
 }
@@ -273,7 +277,7 @@ table#cases {
 }
 
 #pearls {
-  height: 650px;
+  height: 550px;
   overflow: auto;
   font-size: 13px;
   padding-top: 10px;

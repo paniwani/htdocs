@@ -50,7 +50,7 @@ foreach ($regions as $region) {
 
 
     // Sort targets in order of GTV -> CTV -> PTV
-    
+
     if (preg_match("/(gtv)/i", $region["name"])) {
       $regions_GTV[] = $region;
     }
@@ -101,7 +101,7 @@ $conn->close();
         <div id="logo"><a href="/cases.php">eContour</a></div>
       </div>
 
-      <div id="navbar" class="navbar-collapse collapse">
+      <div id="navbar">
 
         <ul class="nav navbar-nav navbar-left">
           <ol class="breadcrumb" id="crumbs">
@@ -141,7 +141,7 @@ $conn->close();
     <div class="row">
 
 
-        <div class="col-md-2" id="legend">
+        <div class="col-xs-2" id="legend">
 
           <div class="row">
 
@@ -206,7 +206,7 @@ $conn->close();
 
 
 
-        <div class="col-md-7">
+        <div class="col-xs-7">
 
             <ul class="nav nav-pills" id="toolbar">
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
@@ -291,7 +291,7 @@ $conn->close();
 
         </div>
 
-        <div class="col-md-3" >
+        <div class="col-xs-3" >
           
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#plan" aria-controls="plan" role="tab" data-toggle="tab">RT Plan</a></li>
