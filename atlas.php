@@ -38,14 +38,37 @@ $regions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Sort regions by target vs OAR
 $regions_TV = [];
+
+$regions_GTV = [];
+$regions_CTV = [];
+$regions_PTV = [];
+
 $regions_OAR = [];
+
 foreach ($regions as $region) {
   if (preg_match("/(gtv)|(ctv)|(ptv)/i", $region["name"])) {
-    $regions_TV[] = $region;
+
+
+    // Sort targets in order of GTV -> CTV -> PTV
+    
+    if (preg_match("/(gtv)/i", $region["name"])) {
+      $regions_GTV[] = $region;
+    }
+
+    if (preg_match("/(ctv)/i", $region["name"])) {
+      $regions_CTV[] = $region;
+    }
+
+    if (preg_match("/(ptv)/i", $region["name"])) {
+      $regions_PTV[] = $region;
+    }
+
   } else {
     $regions_OAR[] = $region;
   }
 }
+
+$regions_TV = array_merge($regions_GTV, $regions_CTV, $regions_PTV);
 
 $overlays = explode(",", $img["overlays"]);
 
@@ -70,61 +93,12 @@ $conn->close();
 
 <body id="atlas">
 
-  <?php include_once("analyticstracking.php") ?>
-
-  <!-- Help Modal -->
-  <div class="modal" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="Help">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Instructions</h4>
-        </div>
-        
-        <div class="modal-body">
-          <h5>Navigation</h5>
-          <ul>
-            <li>To scroll through images: keyboard up/down, scroll with mouse, or use slider</li>
-            <li>Use the toolbar to zoom in, zoom out, and pan</li>
-          </ul>
-
-          <h5>Contours</h5>
-          <ul>
-            <li>Legend on the left is used to manipulate contours, which are divided into:
-              <ul>
-                <li>Organs at risk (OARs)</li>
-                <li>Target volumes</li>
-              </ul>
-            </li>
-
-            <li>Use the toggle located at the top of the legend to turn all contours on/off</li>
-            <li>Scroll over a contour label to highlight it on the image</li>
-            <li>Click on a contour label to enable highlighting through different image slices</li>
-            <li>Use the checkboxes to turn individual contours on/off</li>
-          </ul>
-
-          <h5>Overlays</h5>
-          <ul>
-            <li>Click on Select Overlay to choose from possible image overlays, i.e. RT Dose or PET/CT</li>
-            <li>Use the sliders to manipulate the overlay blending and adjust dose threshold</li>
-          </ul>
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
   <!-- Static navbar -->
   <nav id="mainNavBar" class="navbar navbar-default navbar-static-top">
     <div class="container">
       
       <div class="navbar-header">
-        <div id="logo">eContour</div>
+        <div id="logo"><a href="/cases.php">eContour</a></div>
       </div>
 
       <div id="navbar" class="navbar-collapse collapse">
@@ -237,7 +211,7 @@ $conn->close();
             <ul class="nav nav-pills" id="toolbar">
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out" data-toggle="tooltip" data-placement="top" title="Zoom Out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
-              <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-hand-up" aria-hidden="true"></i></button></li>
+              <!-- <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-hand-up" aria-hidden="true"></i></button></li> -->
               <!-- <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li> -->
             </ul>
 
@@ -358,6 +332,53 @@ $conn->close();
 
 <div id="image-data" data-id="<?= $imageID ?>" data-name="<?= $img['name'] ?>" data-basename="<?= $img['basename'] ?>" data-numslices="<?= $img['numSlices'] ?>" data-loadmode="<?= $loadMode ?>" data-numrequests="<?= $numRequests ?>" data-dosemaximum="<?= $img['doseMaximum'] ?>" data-overlays="<?= $img['overlays'] ?>" data-zoom="<?= $img['zoom'] ?>"></div>
 
+<!-- Help Modal -->
+  <div class="modal" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="Help">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Instructions</h4>
+        </div>
+        
+        <div class="modal-body">
+          <h5>Navigation</h5>
+          <ul>
+            <li>To scroll through images: keyboard up/down, scroll with mouse, or use slider</li>
+            <li>Use the toolbar to zoom in, zoom out, and pan</li>
+          </ul>
+
+          <h5>Contours</h5>
+          <ul>
+            <li>Legend on the left is used to manipulate contours, which are divided into:
+              <ul>
+                <li>Organs at risk (OARs)</li>
+                <li>Target volumes</li>
+              </ul>
+            </li>
+
+            <li>Use the toggle located at the top of the legend to turn all contours on/off</li>
+            <li>Scroll over a contour label to highlight it on the image</li>
+            <li>Click on a contour label to enable highlighting through different image slices</li>
+            <li>Use the checkboxes to turn individual contours on/off</li>
+          </ul>
+
+          <h5>Overlays</h5>
+          <ul>
+            <li>Click on Select Overlay to choose from possible image overlays, i.e. RT Dose or PET/CT</li>
+            <li>Use the sliders to manipulate the overlay blending and adjust dose threshold</li>
+          </ul>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<?php include_once("analyticstracking.php") ?>
 
 </body>
 

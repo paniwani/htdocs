@@ -524,7 +524,7 @@ function setupImage() {
         // Enable all stack tools we want to use with this element
         cornerstoneTools.stackScrollKeyboard.activate(element);
         cornerstoneTools.stackScrollWheel.activate(element);
-        // cornerstoneTools.pan.activate(element, 1);
+        cornerstoneTools.pan.activate(element, 1);
         // cornerstoneTools.stackScroll.activate(element, 1);
         // cornerstoneTools.wwwc.activate(element, 1);
         // cornerstoneTools.zoomWheel.activate(element);

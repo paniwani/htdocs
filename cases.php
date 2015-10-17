@@ -92,7 +92,6 @@ if ($conn->connect_error) {
 
       <thead>
         <tr>
-          <th>#</th>
           <th>Site</th>
           <th>Subsite</th>
           <th>Stage</th>
@@ -109,13 +108,12 @@ if ($conn->connect_error) {
         ?>
 
           <tr class="clickable-row" data-href="/atlas.php?id=<?=$img['id']?>">
-            <td><?= $img['id'] ?></td>
             <td><?= $img['site'] ?></td>
             <td>
               <?php 
                 $sitename = ucwords($img['subsite']);
                 if (!empty($img['subsubsite'])) {
-                  $sitename = $sitename . " -- " . $img['subsubsite'];
+                  $sitename = $sitename . "<br />" . "<span class='subsubsite'>(" . $img['subsubsite'] . ")</span>";
                 }
 
                 echo $sitename;
