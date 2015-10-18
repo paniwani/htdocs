@@ -83,6 +83,7 @@ $conn->close();
     <link href="css/bootstrap-slider.min.css" rel="stylesheet">
     <link href="css/bootstrap-switch.min.css" rel="stylesheet">
     <link href="css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="css/perfect-scrollbar.min.css" rel="stylesheet">
     <link href="css/atlas.css" rel="stylesheet">
     
     <!-- Fonts -->
@@ -151,7 +152,7 @@ $conn->close();
               </ul>
 
               <div class="tab-content">
-                <div class="tab-pane fade active in regions-tab" id="OAR_regions">
+                <div class="tab-pane fade active in regions-tab perfect-scroll" id="OAR_regions">
                   
                   <input type="checkbox" id="OAR_switch" data-label-text="Contours" checked>
 
@@ -177,7 +178,7 @@ $conn->close();
 
                 </div>
                   
-                <div class="tab-pane fade in regions-tab" id="TV_regions">
+                <div class="tab-pane fade in regions-tab perfect-scroll" id="TV_regions">
                   
                   <input type="checkbox" id="TV_switch" data-label-text="Contours" checked>
 
@@ -324,7 +325,7 @@ $conn->close();
               <p><?= $img['plan'] ?></p>
             </div>
 
-            <div class="tab-pane fade in" id="pearls">
+            <div class="tab-pane fade in perfect-scroll" id="pearls">
               <?php
                 if (empty($img['pearls'])) {
                   echo "<p>No clinical pearls available yet.</p>";
@@ -407,6 +408,7 @@ $conn->close();
 <script src="js/bootstrap-slider.min.js"></script>
 <script src="js/bootstrap-switch.min.js"></script>
 <script src="js/bootstrap-select.min.js"></script>
+<script src="js/perfect-scrollbar.min.js"></script>
 <script src="js/cornerstone.min.js"></script>
 <script src="js/cornerstoneMath.min.js"></script>
 <script src="js/cornerstoneTools.min.js"></script>

@@ -323,6 +323,9 @@ $(function() {
             cornerstone.updateImage(element);
         });
 
+        // Scrollbar
+        $(".perfect-scroll").perfectScrollbar();
+
         // Highlight active region on mouse over
         $("#legend .region").mouseenter(function() {
             regionId = parseInt($(this).get(0).dataset.id);
@@ -466,7 +469,7 @@ function onImageProgressLoaded (event, args){
            setTimeout(function () {   
               $(element).trigger(e);          
               if (--i) myLoop(i);
-           }, 3) // speed in msec
+           }, 4) // speed in msec
         })(middle);
     }
 }
