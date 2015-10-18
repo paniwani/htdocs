@@ -43,7 +43,7 @@ if ($conn->connect_error) {
     <div class="container">
       
       <div class="navbar-header">
-        <div id="logo">eContour</div>
+        <div id="logo"><a href="/cases.php">eContour</a></div>
       </div>
 
       <div id="navbar" class="navbar-collapse collapse">
@@ -73,20 +73,39 @@ if ($conn->connect_error) {
     </ul> -->
 
     <div class="btn-group btn-group-lg" role="group" id="sites">
-      <button type="button" class="btn btn-primary">H&N</button>
-      <button type="button" class="btn btn-default">CNS</button>
-      <button type="button" class="btn btn-default">Thorax</button>
-      <button type="button" class="btn btn-default">Breast</button>
-      <button type="button" class="btn btn-default">GI</button>
-      <button type="button" class="btn btn-default">GU</button>
-      <button type="button" class="btn btn-default">GYN</button>
-      <button type="button" class="btn btn-default">Lymphoma</button>
-      <button type="button" class="btn btn-default">Sarcoma</button>
+      <a href="/cases.php?site=hn" class="btn btn-default">H&N</a>
+      <a href="/cases.php?site=thorax" class="btn btn-default">Thorax</a>
+      <a href="/cases.php?site=breast" class="btn btn-default">Breast</a>
+      <a href="/cases.php?site=gi" class="btn btn-default">GI</a>
+      <a href="/cases.php?site=gu" class="btn btn-default">GU</a>
+      <a href="/cases.php?site=gyn" class="btn btn-default">GYN</a>
+      <a href="/cases.php?site=lymphoma" class="btn btn-default">Lymphoma</a>
+      <a href="/cases.php?site=sarcoma" class="btn btn-default">Sarcoma</a>      
     </div>
 
     <br />
 
     <h2 class="page-header">Cases</h2>
+
+    <?php
+
+    $query = "SELECT * FROM images";
+    if(isset($_GET['site'])) {
+      $site = $_GET['site'];
+      if ($site == "hn") { $site = "h&n"; }
+
+      $query .= " WHERE site = '" . $site . "'";
+    }
+    
+    $result = $conn->query($query);
+
+    if ($result->num_rows == 0):
+
+    ?>
+
+    <p id="nocases">No available cases. Please try again later!</p>
+
+    <?php else: ?>
 
     <table class="table table-striped" id="cases">
 
@@ -101,11 +120,7 @@ if ($conn->connect_error) {
 
       <tbody>
 
-        <?php
-          $result = $conn->query("SELECT * FROM images");
-          
-          while ($img = $result->fetch_assoc()):
-        ?>
+      <?php while ($img = $result->fetch_assoc()): ?>
 
           <tr class="clickable-row" data-href="/atlas.php?id=<?=$img['id']?>">
             <td><?= $img['site'] ?></td>
@@ -123,10 +138,12 @@ if ($conn->connect_error) {
             <td><?= $img['assessment'] ?></td>
           </tr>
 
-        <?php endwhile ?>
+        <?php endwhile; ?>
         
       </tbody>
     </table>
+
+    <?php endif; ?>
   </div>
 
 </body>
