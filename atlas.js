@@ -448,30 +448,28 @@ function onImageProgressLoaded (event, args){
 
     // When loading is complete, show the main content and hide the progress bar
 
-    // if ((loadProgress["remaining"] / loadProgress["total"]) === 0) {
-    //     console.timeEnd("Stack Loading");
+    if ((loadProgress["remaining"] / loadProgress["total"]) === 0) {
+        console.timeEnd("Stack Loading");
 
-    //     console.log("Finished loading stacks");
+        $("#progressContainer").hide();
+        $("#mainContainer").css("visibility", "visible");
+        $(element).focus();
 
-    //     $("#progressContainer").hide();
-    //     $("#mainContainer").css("visibility", "visible");
-    //     $(element).focus();
+        // Scroll to middle of image
+        // Using hacky method of simulating key press up
 
-    //     // Scroll to middle of image
-    //     // Using hacky method of simulating key press up
-
-    //     var e = $.Event("keydown", { keyCode: 38}); // keyboard up
-    //     var middle = Math.round(stack.imageIds.length/2);
+        var e = $.Event("keydown", { keyCode: 38}); // keyboard up
+        var middle = Math.round(stack.imageIds.length/2);
         
-    //     // Trigger key event with delay in each iteration of the loop
-    //     // http://stackoverflow.com/questions/3583724/how-do-i-add-a-delay-in-a-javascript-loop
-    //     (function myLoop (i) {          
-    //        setTimeout(function () {   
-    //           $(element).trigger(e);          
-    //           if (--i) myLoop(i);
-    //        }, 4) // speed in msec
-    //     })(middle);
-    // }
+        // Trigger key event with delay in each iteration of the loop
+        // http://stackoverflow.com/questions/3583724/how-do-i-add-a-delay-in-a-javascript-loop
+        (function myLoop (i) {          
+           setTimeout(function () {   
+              $(element).trigger(e);          
+              if (--i) myLoop(i);
+           }, 4) // speed in msec
+        })(middle);
+    }
 }
 
 function changeAllContours(regionType, flag, ignoreRegions) {

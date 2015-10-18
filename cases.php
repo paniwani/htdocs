@@ -59,19 +59,6 @@ if ($conn->connect_error) {
 
   <div class="container">
 
-    <!-- <ul class="nav nav-pills" id="sites-nav">
-      <li role="presentation" class="active"><a href="#">H&N</a></li>
-      <li role="presentation"><a href="#">CNS</a></li>
-      <li role="presentation"><a href="#">Thorax</a></li>
-      <li role="presentation"><a href="#">Breast</a></li>
-      <li role="presentation"><a href="#">GI</a></li>
-      <li role="presentation"><a href="#">GU</a></li>
-      <li role="presentation"><a href="#">GYN</a></li>
-      <li role="presentation"><a href="#">Lymphoma</a></li>
-      <li role="presentation"><a href="#">Thorax</a></li>
-      <li role="presentation"><a href="#">MSK/Sarcoma</a></li>
-    </ul> -->
-
     <div class="btn-group btn-group-lg" role="group" id="sites">
       <a href="/cases.php?site=hn" class="btn btn-default">H&N</a>
       <a href="/cases.php?site=thorax" class="btn btn-default">Thorax</a>
