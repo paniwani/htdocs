@@ -218,6 +218,8 @@ $conn->close();
 
         <div class="col-xs-7">
 
+          <div class="row">
+
             <ul class="nav nav-pills" id="toolbar">
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-in" data-toggle="tooltip" data-placement="top" title="Zoom In"> <i class="glyphicon glyphicon-zoom-in" aria-hidden="true"></i></button></li>
               <li><button type="button" class="btn btn-default navbar-btn" id="zoom-out" data-toggle="tooltip" data-placement="top" title="Zoom Out"> <i class="glyphicon glyphicon-zoom-out" aria-hidden="true"></i></button></li>
@@ -256,8 +258,14 @@ $conn->close();
 
             </select> 
 
-            
-            <input type="range" id="slice-range">
+            <div id="sliceSliderDiv">
+              <input type="text" id="sliceSlider" class="slider" value="1" />
+            </div>
+
+          </div>
+
+
+        <div class="row" id="dicomImageRow">
             
 
             <div id="dicomImageWrapper"
@@ -298,6 +306,8 @@ $conn->close();
                 </div>
 
             </div>
+
+          </div>
 
         </div>
 

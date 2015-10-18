@@ -10,6 +10,8 @@ var overlayMode = "NONE";
 var overlayAlpha = 0.5;
 var zoom;
 
+var sliceSlider;
+
 $(function() {
     var imgdata = {};
     var ignoreRegions = [];
@@ -240,20 +242,40 @@ $(function() {
             cornerstone.updateImage(element);
         });
 
-        // Slice range slider
-        var range = $("#slice-range").get(0);
-        range.min = 0;
-        range.step = 1;
-        range.max = stack.imageIds.length - 1;
-        range.value = Math.round(stack.imageIds.length/2);
-        $("#slice-range").on("input", rangeSelectImage);
+
+        sliceSlider = $("#sliceSlider").slider({
+            id: "sliceSlider",
+            orientation: "horizontal",
+            min: 0,
+            max: stack.imageIds.length - 1,
+            step: 1,
+            value: Math.round(stack.imageIds.length/2),
+            tooltip: 'hide'
+        }).on("slide", function(data) {
+
+
+          // Get the range input value
+          var newImageIdIndex = data.value;
+
+          // Switch images, if necessary
+          if(newImageIdIndex !== stack.currentImageIdIndex && stack.imageIds[newImageIdIndex] !== undefined) {
+              cornerstone.loadAndCacheImage(stack.imageIds[newImageIdIndex]).then(function(image) {
+                  var viewport = cornerstone.getViewport(element);
+                  stack.currentImageIdIndex = newImageIdIndex;
+                  cornerstone.displayImage(element, image, viewport);
+              });
+          }
+
+        });
 
         // Update slider when image changes
 
         $(element).on("CornerstoneNewImage", function(event) {
-          var range = $("#slice-range").get(0);
-          if (range.value != stack.currentImageIdIndex) {
-            range.value = stack.currentImageIdIndex;
+
+          var value = sliceSlider.slider('getValue');
+
+          if (value != stack.currentImageIdIndex) {
+            sliceSlider.slider('setValue', stack.currentImageIdIndex);
           }
         }); 
 
@@ -479,20 +501,20 @@ function changeAllContours(regionType, flag, ignoreRegions) {
     cornerstone.updateImage(element);
 }
 
-function rangeSelectImage(event) {
+// function rangeSelectImage(event) {
 
-  // Get the range input value
-  var newImageIdIndex = parseInt(event.currentTarget.value, 10);
+//   // Get the range input value
+//   var newImageIdIndex = parseInt(event.currentTarget.value, 10);
 
-  // Switch images, if necessary
-  if(newImageIdIndex !== stack.currentImageIdIndex && stack.imageIds[newImageIdIndex] !== undefined) {
-      cornerstone.loadAndCacheImage(stack.imageIds[newImageIdIndex]).then(function(image) {
-          var viewport = cornerstone.getViewport(element);
-          stack.currentImageIdIndex = newImageIdIndex;
-          cornerstone.displayImage(element, image, viewport);
-      });
-  }
-}
+//   // Switch images, if necessary
+//   if(newImageIdIndex !== stack.currentImageIdIndex && stack.imageIds[newImageIdIndex] !== undefined) {
+//       cornerstone.loadAndCacheImage(stack.imageIds[newImageIdIndex]).then(function(image) {
+//           var viewport = cornerstone.getViewport(element);
+//           stack.currentImageIdIndex = newImageIdIndex;
+//           cornerstone.displayImage(element, image, viewport);
+//       });
+//   }
+// }
 
 function setupImage() {
     // Enable the dicomImage element

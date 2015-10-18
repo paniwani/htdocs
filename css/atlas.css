@@ -215,6 +215,14 @@ button {
   display: none;
 }
 
+#sliceSlider {
+  position: absolute;
+  width: 550px;
+  top: 50px;
+  left: 60px;
+  z-index: 1;
+}
+
 #alphaText {
   text-align: center;
 }
@@ -323,6 +331,10 @@ table#cases {
 
 .subsubsite {
   font-size: 12px;
+}
+
+#dicomImageRow {
+  margin-top: 15px;
 }
 
 
