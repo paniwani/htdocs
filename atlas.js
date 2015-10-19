@@ -200,8 +200,13 @@ $(function() {
 
         var doseMax = imgdata.dosemaximum;
         console.log(doseMax);
-        var ticks = _.range(0, doseMax, doseMax > 35 ? 10 : 5);
-        // if ( (doseMax % 5) !== 0 ) { ticks.push(doseMax) }
+
+        var ticks;
+        if (doseMax > 45) {
+            ticks = _.range(0, 10*Math.ceil(doseMax/10) + 1, 10);
+        } else {
+            ticks = _.range(0, 5*Math.ceil(doseMax/5) + 1, 5);
+        }
         
         var ticksStrings = [];
         for (var i=0; i < ticks.length; i++) {
@@ -504,21 +509,6 @@ function changeAllContours(regionType, flag, ignoreRegions) {
     }
     cornerstone.updateImage(element);
 }
-
-// function rangeSelectImage(event) {
-
-//   // Get the range input value
-//   var newImageIdIndex = parseInt(event.currentTarget.value, 10);
-
-//   // Switch images, if necessary
-//   if(newImageIdIndex !== stack.currentImageIdIndex && stack.imageIds[newImageIdIndex] !== undefined) {
-//       cornerstone.loadAndCacheImage(stack.imageIds[newImageIdIndex]).then(function(image) {
-//           var viewport = cornerstone.getViewport(element);
-//           stack.currentImageIdIndex = newImageIdIndex;
-//           cornerstone.displayImage(element, image, viewport);
-//       });
-//   }
-// }
 
 function setupImage() {
     // Enable the dicomImage element
