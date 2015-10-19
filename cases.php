@@ -59,15 +59,21 @@ if ($conn->connect_error) {
 
   <div class="container">
 
+    <?php
+      $site = "";
+      
+      if (isset($_GET['site'])) { $site = $_GET['site']; }
+    ?>
+
     <div class="btn-group btn-group-lg" role="group" id="sites">
-      <a href="/cases.php?site=hn" class="btn btn-default">H&N</a>
-      <a href="/cases.php?site=thorax" class="btn btn-default">Thorax</a>
-      <a href="/cases.php?site=breast" class="btn btn-default">Breast</a>
-      <a href="/cases.php?site=gi" class="btn btn-default">GI</a>
-      <a href="/cases.php?site=gu" class="btn btn-default">GU</a>
-      <a href="/cases.php?site=gyn" class="btn btn-default">GYN</a>
-      <a href="/cases.php?site=lymphoma" class="btn btn-default">Lymphoma</a>
-      <a href="/cases.php?site=sarcoma" class="btn btn-default">Sarcoma</a>      
+      <a href="/cases.php?site=hn" class="btn <?= ($site == "hn") ? "btn-primary" : "btn-default" ?>">H&N</a>
+      <a href="/cases.php?site=thorax" class="btn <?= ($site == "thorax") ? "btn-primary" : "btn-default" ?>">Thorax</a>
+      <a href="/cases.php?site=breast" class="btn <?= ($site == "breast") ? "btn-primary" : "btn-default" ?>">Breast</a>
+      <a href="/cases.php?site=gi" class="btn <?= ($site == "gi") ? "btn-primary" : "btn-default" ?>">GI</a>
+      <a href="/cases.php?site=gu" class="btn <?= ($site == "gu") ? "btn-primary" : "btn-default" ?>">GU</a>
+      <a href="/cases.php?site=gyn" class="btn <?= ($site == "gyn") ? "btn-primary" : "btn-default" ?>">GYN</a>
+      <a href="/cases.php?site=lymphoma" class="btn <?= ($site == "lymphoma") ? "btn-primary" : "btn-default" ?>">Lymphoma</a>
+      <a href="/cases.php?site=sarcoma" class="btn <?= ($site == "sarcoma") ? "btn-primary" : "btn-default" ?>">Sarcoma</a>      
     </div>
 
     <br />
