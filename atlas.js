@@ -269,7 +269,6 @@ $(function() {
         });
 
         // Update slider when image changes
-
         $(element).on("CornerstoneNewImage", function(event) {
 
           var value = sliceSlider.slider('getValue');
@@ -354,6 +353,10 @@ $(function() {
                     cornerstone.updateImage(element);
                 }
             }
+
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
         });
 
         // ww/wc presets

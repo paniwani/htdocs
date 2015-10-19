@@ -166,7 +166,7 @@ $conn->close();
 
                             <div>
                               <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div> 
-                              <p><?= $region["name"] ?></p>
+                              <p class="regionName"><?= $region["name"] ?></p>
                             </div>
                           </label>
                       </div>
