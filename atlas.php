@@ -89,7 +89,7 @@ $conn->close();
     <!-- Fonts -->
     <link href='https://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
 
-    <title>Rad Onc Atlas</title>
+    <title>eContour</title>
 </head>
 
 <body id="atlas">
