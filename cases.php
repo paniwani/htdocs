@@ -50,7 +50,7 @@ if ($conn->connect_error) {
 
         <ul class="nav navbar-nav navbar-right">
           <div id="logged-in">
-            <?php include("views/logged_in.php"); ?>
+            <?php echo $_SESSION['user_name']; ?> | <a href="index.php?logout">Sign Out</a>
           </div>
         </ul>
       </div><!--/.nav-collapse -->
