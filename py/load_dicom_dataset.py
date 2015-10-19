@@ -14,6 +14,7 @@ from RTStruct import RTStruct
 from RTDose import RTDose
 from RTPET import RTPET
 from RTMR import RTMR
+from RTCT import RTCT
 
 
 def usage():
@@ -77,7 +78,7 @@ for i, row in enumerate(ws.rows):
 
 
 # DEBUGGING ONLY
-# datasets = datasets[0:2]
+# datasets = datasets[2:3]
 
 print "Loading the following patients: "
 print ','.join([str(ds['UID']) for ds in datasets])
@@ -94,6 +95,7 @@ for dataset in datasets:
   PT_dir = os.path.join(dataset_dir, "PTCT")
   MR1_dir = os.path.join(dataset_dir, "MR1")
   MR2_dir = os.path.join(dataset_dir, "MR2")
+  CT2_dir = os.path.join(dataset_dir, "CT2")
 
   # Get image file names
 
@@ -180,7 +182,7 @@ for dataset in datasets:
     cur.execute("UPDATE images SET PET_SUVbw_scale_factor=%s WHERE id=%s", (rtPET.SUVbw_scale_factor, imageID)) 
     print "Saved PET"
 
-  # Get and save PET if it exists
+  # Get and save MRI if it exists
   if os.path.isdir(MR1_dir):
     overlays.append("MR1")
 
@@ -198,6 +200,15 @@ for dataset in datasets:
     os.makedirs(out_MR_dir)
     sitk.WriteImage(rtMR.MR_image, [os.path.join(out_MR_dir, "MR2.{0}.jpg".format(i)) for i in range(rtMR.MR_image.GetSize()[2], 0, -1)], True)
     print "Saved MRI T2"
+
+  if os.path.isdir(CT2_dir):
+    overlays.append("CT2")
+
+    rtCT2 = RTCT(CT_image, CT2_dir, invertFlag)
+    out_CT2_dir = os.path.join(dsDir, "CT2")
+    os.makedirs(out_CT2_dir)
+    sitk.WriteImage(rtCT2.MR_image, [os.path.join(out_CT2_dir, "CT2.{0}.jpg".format(i)) for i in range(rtCT2.MR_image.GetSize()[2], 0, -1)], True)
+    print "Saved CT2"
 
   # Update overlays in db
   cur.execute("UPDATE images SET overlays=%s WHERE id=%s", (",".join([str(x) for x in overlays]), imageID))

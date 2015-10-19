@@ -315,6 +315,11 @@ table#cases {
 
 .regions-tab {
   height: 550px;
+  overflow-y: hidden;
+}
+
+.contours {
+  height: 475px;
   overflow-y: auto;
 }
 

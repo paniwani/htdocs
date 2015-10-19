@@ -106,8 +106,8 @@ $conn->close();
 
         <ul class="nav navbar-nav navbar-left">
           <ol class="breadcrumb" id="crumbs">
-            <li><a href="/cases.php"><?= $img['site'] ?></a></li>
-            <li><a href="/cases.php"><?= ucwords($img['subsite']) ?></a></li>
+            <li><a href="/cases.php?site=<?= strtolower(str_replace('&', '', $img['site'])) ?>"><?= $img['site'] ?></a></li>
+            <li><?= ucwords($img['subsite']) ?></li>
             <li class="active">Case #<?= $img['id'] ?></li>
           </ol>
         </ul>
@@ -151,9 +151,11 @@ $conn->close();
               </ul>
 
               <div class="tab-content">
-                <div class="tab-pane fade active in regions-tab perfect-scroll" id="OAR_regions">
+                <div class="tab-pane fade active in regions-tab" id="OAR_regions">
                   
                   <input type="checkbox" id="OAR_switch" data-label-text="Contours" checked>
+
+                  <div class="contours perfect-scroll">
 
                   <?php foreach($regions_OAR as $region): ?>
 
@@ -175,11 +177,15 @@ $conn->close();
 
                   <?php endforeach; ?>
 
+                  </div>
+
                 </div>
                   
-                <div class="tab-pane fade in regions-tab perfect-scroll" id="TV_regions">
+                <div class="tab-pane fade in regions-tab" id="TV_regions">
                   
                   <input type="checkbox" id="TV_switch" data-label-text="Contours" checked>
+
+                  <div class="contours perfect-scroll">
 
                   <?php foreach($regions_TV as $region): ?>
 
@@ -192,7 +198,7 @@ $conn->close();
 
                             <div>
                               <div class="color-swatch" style="background-color: rgb(<?= $region['color'] ?>);"></div> 
-                              <p><?= $region["name"] ?></p>
+                              <p class="regionName"><?= $region["name"] ?></p>
                             </div>
                           </label>
                       </div>
@@ -200,6 +206,8 @@ $conn->close();
                     </div>
 
                   <?php endforeach; ?>
+
+                  </div>
 
                   
                 </div>
@@ -220,6 +228,8 @@ $conn->close();
               <!-- <li><button type="button" class="btn btn-default navbar-btn" id="pan" data-toggle="tooltip" data-placement="top" title="Pan"> <i class="glyphicon glyphicon-hand-up" aria-hidden="true"></i></button></li> -->
               <!-- <li><button type="button" class="btn btn-default navbar-btn" id="wwwc" data-toggle="tooltip" data-placement="top" title="Window/Level"> <i class="glyphicon glyphicon-align-left" aria-hidden="true"></i></button></li> -->
             </ul>
+
+            <?php if (!empty(array_filter($overlays))): ?>
 
             <select class="selectpicker show-tick pull-right" id="overlaySelect" data-width="150px" data-style="btn-primary">
              
@@ -244,6 +254,10 @@ $conn->close();
                     case "MR2":
                       echo "<option value='MR2'>MRI T2</option>";
                       break;
+
+                    case "CT2":
+                      echo "<option value='CT2'>CT Pre-op</option>";
+                      break;
                   }
 
                 endforeach;
@@ -251,6 +265,8 @@ $conn->close();
               ?>
 
             </select> 
+
+            <?php endif; ?>
 
             <div id="sliceSliderDiv">
               <input type="text" id="sliceSlider" />
@@ -338,6 +354,7 @@ $conn->close();
       <div id="petImage"></div>
       <div id="mr1Image"></div>
       <div id="mr2Image"></div>
+      <div id="ct2Image"></div>
       <canvas id="canvasTemp" width="512" height="512"></canvas>
     </div>
 </div>
