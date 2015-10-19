@@ -141,7 +141,6 @@ $conn->close();
     
     <div class="row">
 
-
         <div class="col-xs-2" id="legend">
 
           <div class="row">
@@ -211,12 +210,6 @@ $conn->close();
         </div>
 
 
-
-
-
-
-
-
         <div class="col-xs-7">
 
           <div class="row">
@@ -260,14 +253,12 @@ $conn->close();
             </select> 
 
             <div id="sliceSliderDiv">
-              <input type="text" id="sliceSlider" class="slider" value="1" />
+              <input type="text" id="sliceSlider" />
             </div>
 
           </div>
 
-
         <div class="row" id="dicomImageRow">
-            
 
             <div id="dicomImageWrapper"
                  class="cornerstone-enabled-image"

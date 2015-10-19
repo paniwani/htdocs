@@ -4,8 +4,8 @@ body#atlas {
   -moz-overflow: hidden;
 
   position: fixed;
-  left: 50%;
-  transform: translate(-50%, 0);
+  left: 0;
+  right: 0;
 }
 
 body#atlas .container {
@@ -245,10 +245,6 @@ button {
   /*color: white;*/
 }
 
-body#auth {
-  /*background-color: black;*/
-}
-
 #logo {
   color: white;
   font-family: 'Poiret One', cursive;
@@ -315,11 +311,6 @@ table#cases {
   width: 800px;
   margin: 0 auto;
   display: block;
-}
-
-#slice-range {
-  margin: 8px auto;
-  width: 600px;
 }
 
 .regions-tab {
